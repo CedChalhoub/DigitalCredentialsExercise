@@ -1,0 +1,6 @@
+version = 0.1
+[default]
+[default.local_start_api]
+environment_variables = [
+  "DYNAMODB_TABLE=local-credential-status"
+]
