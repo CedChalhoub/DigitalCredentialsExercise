@@ -5,9 +5,9 @@ Resources:
   CredentialApi:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./app
-      Handler: main.handler
-      Runtime: python3.12
+      CodeUri: ./
+      Handler: app/main.handler
+      Runtime: python3.11
       Environment:
         Variables:
           DYNAMODB_TABLE: !Ref CredentialStatusTable
@@ -18,8 +18,11 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /credentials/{proxy+}
+            Path: /{proxy+}
             Method: ANY
+            Auth:
+              ApiKeyRequired: false
+              AuthorizationType: 'NONE'
 
   CredentialStatusTable:
     Type: AWS::DynamoDB::Table
@@ -44,7 +47,7 @@ Resources:
     Properties:
       StageName: prod
       Cors:
-        AllowMethods: "'GET,POST"
+        AllowMethods: "'GET,POST'"
         AllowHeaders: "'Content-Type'"
         AllowOrigin: "'*'"
 
