@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from mangum import Mangum
 
-from app.api.routes import credential_resource
+from app.api.routes import CredentialRouter
 
 app = FastAPI()
-app.include_router(credential_resource.router)
+app.include_router(CredentialRouter.router)
 
 handler = Mangum(app)

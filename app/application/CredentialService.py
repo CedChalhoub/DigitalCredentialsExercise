@@ -1,6 +1,6 @@
 from app.domain import Credential
 from app.domain.CredentialStatus import CredentialStatus
-from app.domain.ICredentialRepository import ICredentialRepository
+from app.domain.AbstractCredentialRepository import ICredentialRepository
 
 
 class CredentialService:

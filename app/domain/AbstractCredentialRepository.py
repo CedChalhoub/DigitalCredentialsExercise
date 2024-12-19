@@ -1,7 +1,7 @@
 from abc import abstractmethod
 
 from app.domain import Credential
-from app.infrastructure.CredentialRepository import CredentialRepository
+from app.infrastructure.DynamoDBCredentialRepository import CredentialRepository
 
 
 class ICredentialRepository(CredentialRepository):
