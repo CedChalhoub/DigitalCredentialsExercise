@@ -3,7 +3,7 @@ from botocore.exceptions import ClientError
 from app.domain import Credential
 import boto3
 
-class CredentialRepository:
+class DynamoDBCredentialRepository:
     def __init__(self):
         self.dynamodb = boto3.resource('dynamodb')
 

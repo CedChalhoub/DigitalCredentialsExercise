@@ -12,8 +12,14 @@ class Credential(ABC):
     def __init__(self, issuer_id: UUID, holder_id: str, valid_from: datetime, valid_until: datetime):
         self._issuer_id = issuer_id
         self._holder_id = holder_id
-        self._valid_from = valid_from
-        self._valid_until = valid_until
+
+        if valid_from.tzinfo is None:
+            raise ValueError("valid_from must be timezone-aware")
+        if valid_until.tzinfo is None:
+            raise ValueError("valid_until must be timezone-aware")
+
+        self._valid_from = valid_from.astimezone(datetime.UTC)
+        self._valid_until = valid_until.astimezone(datetime.UTC)
         self._status = CredentialStatus.ACTIVE
         self._suspension_reason: Optional[str] = None
         self._revocation_reason: Optional[str] = None
