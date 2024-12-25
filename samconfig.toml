@@ -2,5 +2,9 @@ version = 0.1
 [default]
 [default.local_start_api]
 environment_variables = [
-  "DYNAMODB_TABLE=local-credential-status"
+  "DYNAMODB_TABLE=local-credential-status",
+  "REPOSITY_TYPE=dynamodb"
 ]
+AWS_ACCESS_KEY_ID = "dummy"
+AWS_SECRET_ACCESS_KEY = "dummy"
+AWS_DEFAULT_REGION = "us-east-1"

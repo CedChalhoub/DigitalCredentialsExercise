@@ -1,6 +1,6 @@
 from enum import Enum
 
 
-class EntityType(Enum):
-    FEDERAL = "federal"
-    PROVINCIAL = "provincial"
+class CredentialType(Enum):
+    DRIVERS_LICENSE = "driversLicense"
+    PASSPORT = "passport"

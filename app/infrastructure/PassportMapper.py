@@ -1,17 +1,16 @@
 from datetime import datetime, UTC
 from uuid import UUID
 
+from app.domain.CredentialType import CredentialType
 from app.domain.Passport import Passport
-from app.infrastructure.AbstractCredentialMapper import AbstractCredentialMapper
-
+from app.application.AbstractCredentialMapper import AbstractCredentialMapper
 
 class PassportMapper(AbstractCredentialMapper):
     def to_dynamo(self, credential: Passport) -> dict:
         return {
-            'PK': f'CRED#{str(credential.id)}',
+            'PK': f'CRED#{str(credential.issuer_id)}',
             'SK': f'METADATA#passport',
-            'credential_id': str(credential.id),
-            'credential_type': 'passport',
+            'credential_type': CredentialType.PASSPORT.value,
             'issuer_id': str(credential.issuer_id),
             'holder_id': credential.holder_id,
             'valid_from': credential.valid_from.isoformat(),

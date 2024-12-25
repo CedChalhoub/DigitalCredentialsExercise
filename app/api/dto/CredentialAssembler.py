@@ -11,5 +11,5 @@ class CredentialAssembler(ABC):
         pass
 
     @abstractmethod
-    def to_domain(self, credential_dto: CredentialDTO) -> Credential:
+    def to_domain(self, credential_dto: dict) -> Credential:
         pass

@@ -1,14 +1,14 @@
 from abc import abstractmethod
 
 from app.domain import Credential
-from app.infrastructure.DynamoDBCredentialRepository import DynamoDBCredentialRepository
+from app.domain.CredentialType import CredentialType
 
 
-class AbstractCredentialRepository(DynamoDBCredentialRepository):
+class AbstractCredentialRepository:
     @abstractmethod
-    def get_credential(self, credential_id: str) -> Credential:
+    def get_credential(self, credential_id: str, credential_type: CredentialType) -> Credential:
         pass
 
     @abstractmethod
-    def new_credential(self, credential: Credential):
+    def create_credential(self, credential: Credential):
         pass

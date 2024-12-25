@@ -8,6 +8,8 @@ Resources:
       CodeUri: ./
       Handler: app/main.handler
       Runtime: python3.11
+      Timeout: 15
+      MemorySize: 256
       Environment:
         Variables:
           DYNAMODB_TABLE: !Ref CredentialStatusTable

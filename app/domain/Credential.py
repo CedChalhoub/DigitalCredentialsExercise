@@ -1,10 +1,11 @@
 from abc import abstractmethod, ABC
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, List
 from uuid import UUID
 
 from app.domain.CredentialStatus import CredentialStatus
-from app.domain.CredentialType import EntityType
+from app.domain.CredentialType import CredentialType
+from app.domain.EntityType import EntityType
 
 
 class Credential(ABC):
@@ -18,8 +19,8 @@ class Credential(ABC):
         if valid_until.tzinfo is None:
             raise ValueError("valid_until must be timezone-aware")
 
-        self._valid_from = valid_from.astimezone(datetime.UTC)
-        self._valid_until = valid_until.astimezone(datetime.UTC)
+        self._valid_from = valid_from.astimezone(timezone.utc)
+        self._valid_until = valid_until.astimezone(timezone.utc)
         self._status = CredentialStatus.ACTIVE
         self._suspension_reason: Optional[str] = None
         self._revocation_reason: Optional[str] = None
@@ -28,6 +29,11 @@ class Credential(ABC):
     def _validate_holder_id(self, holder_id: str) -> None:
         """Validate the holder_id"""
         pass
+
+    @abstractmethod
+    def get_credential_type(self) -> CredentialType:
+        pass
+
     @property
     def id(self) -> UUID:
         return self._id

@@ -1,17 +1,16 @@
 from datetime import datetime, UTC
 from uuid import UUID
 
+from app.domain.CredentialType import CredentialType
 from app.domain.DriversLicense import DriversLicense
-from app.infrastructure.AbstractCredentialMapper import AbstractCredentialMapper
-
+from app.application.AbstractCredentialMapper import AbstractCredentialMapper
 
 class DriversLicenseMapper(AbstractCredentialMapper):
     def to_dynamo(self, credential: DriversLicense) -> dict:
         return {
-            'PK': f'CRED#{str(credential.id)}',
+            'PK': f'CRED#{str(credential.issuer_id)}',
             'SK': f'METADATA#drivers_license',
-            'credential_id': str(credential.id),
-            'credential_type': 'drivers_license',
+            'credential_type': CredentialType.DRIVERS_LICENSE.value,
             'issuer_id': str(credential.issuer_id),
             'holder_id': credential.holder_id,
             'valid_from': credential.valid_from.isoformat(),
