@@ -27,7 +27,7 @@ class PassportMapper(AbstractCredentialMapper):
 
     def to_domain(self, item: dict) -> Passport:
         return Passport(
-            issuer_id=UUID(item['issuer_id']),
+            issuer_id=item['issuer_id'],
             holder_id=item['holder_id'],
             valid_from=datetime.fromisoformat(item['valid_from']),
             valid_until=datetime.fromisoformat(item['valid_until']),

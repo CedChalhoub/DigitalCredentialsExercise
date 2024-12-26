@@ -35,7 +35,7 @@ class DynamoDBCredentialRepository(AbstractCredentialRepository):
             response = self._table.get_item(
                 Key={
                     'PK': f'CRED#{credential_id}',
-                    'SK': f'METADATA#{credential_type.value}passport'
+                    'SK': f'METADATA#{credential_type.value}'
                 })
             print(response)
             item = response.get('Item')
@@ -43,8 +43,9 @@ class DynamoDBCredentialRepository(AbstractCredentialRepository):
             if not item:
                 return None
 
-            return self._mapperFactory.get_mapper(item.get('credential_type')).to_domain(item)
-
+            mapper = self._mapperFactory.get_mapper(CredentialType(item.get('credential_type')))
+            credential = mapper.to_domain(item)
+            return credential
         except ClientError as e:
             print(f"Error getting item from DynamoDB: {e.response['Error']['Message']}")
             return None
@@ -56,7 +57,6 @@ class DynamoDBCredentialRepository(AbstractCredentialRepository):
         """
         Creates the Credentials table if it doesn't exist
         """
-        logging.info("Creating Credentials table...")
         try:
             # Create the table
             table = self.dynamodb.create_table(
@@ -89,14 +89,11 @@ class DynamoDBCredentialRepository(AbstractCredentialRepository):
 
             # Wait for the table to be created
             table.meta.client.get_waiter('table_exists').wait(TableName='Credentials')
-            logging.info("Table created successfully!")
             return table
         except ClientError as e:
             if e.response['Error']['Code'] == 'ResourceInUseException':
-                logging.info("Table already exists")
                 return self.dynamodb.Table('Credentials')
             else:
-                logging.error(f"Error creating table: {e}")
                 raise
     def create_credential(self, credential: Credential):
         try:
@@ -106,5 +103,5 @@ class DynamoDBCredentialRepository(AbstractCredentialRepository):
             print("Sample credential inserted successfully!")
             return response
         except ClientError as e:
-            logging.error(f"Error putting item: {e}")
+            print(f"Error putting item: {e}")
             raise

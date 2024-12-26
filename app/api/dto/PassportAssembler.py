@@ -23,7 +23,7 @@ class PassportAssembler(CredentialAssembler):
     def to_domain(self, credential_dto: dict) -> Passport:
         return Passport(
             holder_id=credential_dto['holder_id'],
-            issuer_id=UUID(credential_dto['issuer_id']),
+            issuer_id=credential_dto['issuer_id'],
             valid_from=datetime.fromisoformat(credential_dto['valid_from']),
             valid_until=datetime.fromisoformat(credential_dto['valid_until']),
             nationality=credential_dto['nationality'],

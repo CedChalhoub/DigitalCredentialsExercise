@@ -23,7 +23,7 @@ class DriversLicenseAssembler(CredentialAssembler):
 
     def to_domain(self, license_dto: dict) -> DriversLicense:
         return DriversLicense(
-            issuer_id=UUID(license_dto['issuer_id']),
+            issuer_id=license_dto['issuer_id'],
             holder_id=license_dto['holder_id'],
             valid_from=datetime.fromisoformat(license_dto['valid_from']),
             valid_until=datetime.fromisoformat(license_dto['valid_until']),
