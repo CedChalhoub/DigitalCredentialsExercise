@@ -12,3 +12,7 @@ class AbstractCredentialRepository:
     @abstractmethod
     def create_credential(self, credential: Credential):
         pass
+
+    @abstractmethod
+    def update_credential_status(self, credential: Credential):
+        pass

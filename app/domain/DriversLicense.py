@@ -31,3 +31,4 @@ class DriversLicense(Credential, ABC):
     @property
     def authorized_issuers(self) -> List[EntityType]:
         return [EntityType.PROVINCIAL]
+

@@ -17,8 +17,16 @@ class CredentialService:
 
     def validate_credential(self, credential_id: str, credential_type: CredentialType) -> CredentialStatus:
         credential: Credential = self._repository.get_credential(credential_id, credential_type)
-        print(credential)
         return credential.status
+
     def create_credential(self, credential: Credential) -> Credential:
         return self._repository.create_credential(credential)
+
+    def update_credential(self, credential_id: str, credential_type: CredentialType, new_status: CredentialStatus, update_reason: str):
+        credential: Credential = self._repository.get_credential(credential_id, credential_type)
+        credential.update_status(new_status, update_reason)
+        self._repository.update_credential_status(credential)
+        print(credential)
+        return credential
+
 

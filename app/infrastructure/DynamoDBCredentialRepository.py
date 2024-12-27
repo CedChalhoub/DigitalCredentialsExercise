@@ -105,3 +105,35 @@ class DynamoDBCredentialRepository(AbstractCredentialRepository):
         except ClientError as e:
             print(f"Error putting item: {e}")
             raise
+
+    def update_credential_status(self, credential: Credential) -> None:
+        update_expression = """
+            SET #status = :status,
+                suspension_reason = :suspension_reason,
+                revocation_reason = :revocation_reason,
+                updated_at = :updated_at
+        """
+
+        try:
+            response = self._table.update_item(
+                Key={
+                    'PK': f'CRED#{str(credential.issuer_id)}',
+                    'SK': f'METADATA#{credential.get_credential_type().value}'
+                },
+                UpdateExpression=update_expression,
+                ExpressionAttributeNames={
+                    '#status': 'status'
+                },
+                ExpressionAttributeValues={
+                    ':status': credential.status.value,
+                    ':suspension_reason': credential.suspension_reason,
+                    ':revocation_reason': credential.revocation_reason,
+                    ':updated_at': datetime.now(UTC).isoformat()
+                },
+                ReturnValues="UPDATED_NEW"
+            )
+            print(response)
+            return response
+        except ClientError as e:
+            print(f"Error updating item in DynamoDB: {e.response['Error']['Message']}")
+            raise

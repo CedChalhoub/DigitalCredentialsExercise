@@ -1,11 +1,13 @@
+from abc import ABC
 from datetime import datetime, UTC
 from uuid import UUID
 
+from app.domain.CredentialStatus import CredentialStatus
 from app.domain.CredentialType import CredentialType
 from app.domain.Passport import Passport
 from app.application.AbstractCredentialMapper import AbstractCredentialMapper
 
-class PassportMapper(AbstractCredentialMapper):
+class PassportMapper(AbstractCredentialMapper, ABC):
     def to_dynamo(self, credential: Passport) -> dict:
         return {
             'PK': f'CRED#{str(credential.issuer_id)}',
@@ -26,7 +28,7 @@ class PassportMapper(AbstractCredentialMapper):
         }
 
     def to_domain(self, item: dict) -> Passport:
-        return Passport(
+        passport: Passport = Passport(
             issuer_id=item['issuer_id'],
             holder_id=item['holder_id'],
             valid_from=datetime.fromisoformat(item['valid_from']),
@@ -34,6 +36,8 @@ class PassportMapper(AbstractCredentialMapper):
             nationality=item['nationality'],
             issuing_country=item['issuing_country']
         )
+        passport.set_suspension_reason(item['suspension_reason'])
+        passport.set_revocation_reason(item['revocation_reason'])
+        passport.set_status(CredentialStatus(item['status']))
 
-    def get_type(self) -> str:
-        return 'passport'
+        return passport

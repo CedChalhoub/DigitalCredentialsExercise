@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Query, Body
 from fastapi.responses import JSONResponse
 
 from app.api.dto.AssemblerRegistry import AssemblerRegistry
+from app.api.dto.StatusUpdateDTO import StatusUpdateDTO
 from app.application.CredentialService import CredentialService
 from app.dependencies import get_credential_service
 from app.domain.Credential import Credential
@@ -65,4 +66,17 @@ class CredentialRouter:
             return JSONResponse(content={"message": "Credential created"},
                                 status_code=201)
 
+        @self._router.patch("/credentials/{credential_id}")
+        async def update_credential(
+                credential_id: str,
+                credential_type: str = Query(..., description="Type of credential to update"),
+                status_update_dict: dict = Body(...),
+                service: CredentialService = Depends(get_credential_service)):
 
+            credential: Credential = service.update_credential(credential_id,
+                                                               CredentialType(credential_type),
+                                                               CredentialStatus(status_update_dict.get("status")),
+                                                               status_update_dict.get("reason"))
+
+
+            return StatusUpdateDTO(**status_update_dict)

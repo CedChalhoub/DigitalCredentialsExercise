@@ -1,11 +1,13 @@
+from abc import ABC
 from datetime import datetime, UTC
 from uuid import UUID
 
+from app.domain.CredentialStatus import CredentialStatus
 from app.domain.CredentialType import CredentialType
 from app.domain.DriversLicense import DriversLicense
 from app.application.AbstractCredentialMapper import AbstractCredentialMapper
 
-class DriversLicenseMapper(AbstractCredentialMapper):
+class DriversLicenseMapper(AbstractCredentialMapper, ABC):
     def to_dynamo(self, credential: DriversLicense) -> dict:
         return {
             'PK': f'CRED#{str(credential.issuer_id)}',
@@ -25,15 +27,15 @@ class DriversLicenseMapper(AbstractCredentialMapper):
             'version': 1
         }
     def to_domain(self, item: dict) -> DriversLicense:
-        return DriversLicense(
+        license: DriversLicense = DriversLicense(
             issuer_id=item['issuer_id'],
             holder_id=item['holder_id'],
             valid_from=datetime.fromisoformat(item['valid_from']),
             valid_until=datetime.fromisoformat(item['valid_until']),
             vehicle_classes=item['vehicle_classes'],
-            issuing_province=item['issuing_province']
-        )
+            issuing_province=item['issuing_province'])
 
-    # TODO: This needs to be handled in a better way
-    def get_type(self) -> str:
-        return 'drivers_license'
+        license.set_suspension_reason(item['suspension_reason'])
+        license.set_revocation_reason(item['revocation_reason'])
+        license.set_status(CredentialStatus(item['status']))
+        return license

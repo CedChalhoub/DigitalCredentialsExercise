@@ -59,22 +59,32 @@ class Credential(ABC):
     def suspend(self, reason: str) -> None:
         # TODO: Add validation
         self._status = CredentialStatus.SUSPENDED
-        self._suspension_reason = reason
+        self.set_suspension_reason(reason)
 
     def reinstate(self) -> None:
         # TODO: Add validation
         self._status = CredentialStatus.ACTIVE
-        self._suspension_reason = None
+        self.set_suspension_reason(None)
+        self.set_suspension_reason(None)
 
     def revoke(self, reason: str) -> None :
         # TODO: Add validation
         self._status = CredentialStatus.REVOKED
-        self._revocation_reason = reason
+        self.set_revocation_reason(reason)
 
     def is_valid(self) -> bool:
         return ((self._status == CredentialStatus.ACTIVE)
                 and (datetime.now() >= self._valid_from)
                 and (datetime.now() <= self._valid_until))
+
+    def set_suspension_reason(self, reason: str | None):
+        self._suspension_reason = reason
+
+    def set_revocation_reason(self, reason: str | None):
+        self._revocation_reason = reason
+
+    def set_status(self, value):
+        self._status = value
 
     @property
     def valid_from(self):
@@ -91,3 +101,12 @@ class Credential(ABC):
     @property
     def revocation_reason(self):
         return self._revocation_reason
+
+    def update_status(self, status: CredentialStatus, reason: str) -> None:
+        match status:
+            case CredentialStatus.SUSPENDED:
+                self.suspend(reason)
+            case CredentialStatus.REVOKED:
+                self.revoke(reason)
+            case CredentialStatus.ACTIVE:
+                self.reinstate()

@@ -11,7 +11,3 @@ class AbstractCredentialMapper(ABC):
     @abstractmethod
     def to_domain(self, dynamo_dict: dict) -> Credential:
         pass
-
-    @abstractmethod
-    def get_type(self) -> str:
-        pass
