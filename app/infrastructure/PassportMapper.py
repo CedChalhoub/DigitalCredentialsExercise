@@ -1,6 +1,5 @@
 from abc import ABC
 from datetime import datetime, UTC
-from uuid import UUID
 
 from app.domain.CredentialStatus import CredentialStatus
 from app.domain.CredentialType import CredentialType

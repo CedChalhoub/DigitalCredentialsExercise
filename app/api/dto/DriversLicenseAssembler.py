@@ -1,5 +1,4 @@
 from datetime import datetime
-from uuid import UUID
 
 from app.api.dto.AssemblerRegistry import AssemblerRegistry
 from app.api.dto.CredentialAssembler import CredentialAssembler

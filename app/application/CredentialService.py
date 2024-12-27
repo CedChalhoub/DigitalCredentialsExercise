@@ -1,12 +1,7 @@
-from uuid import UUID
-
 from app.domain import Credential
 from app.domain.CredentialStatus import CredentialStatus
 from app.domain.AbstractCredentialRepository import AbstractCredentialRepository
 from app.domain.CredentialType import CredentialType
-from app.domain.Entity import Entity
-from app.domain.EntityType import EntityType
-
 
 class CredentialService:
     def __init__(self, repository: AbstractCredentialRepository):

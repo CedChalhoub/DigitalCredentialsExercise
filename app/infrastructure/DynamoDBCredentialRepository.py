@@ -1,6 +1,4 @@
-import logging
 from datetime import datetime, UTC
-from uuid import UUID
 
 from botocore.exceptions import ClientError
 from botocore.config import Config
