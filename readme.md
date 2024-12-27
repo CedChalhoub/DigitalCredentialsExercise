@@ -34,8 +34,9 @@ pip install -r requirements.txt
 
 1. Start DynamoDB Local:
 ```bash
-docker-compose up dynamodb-local
+java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
 ```
+Note: Requires Java Runtime Environment (JRE) version 8.x or newer
 
 2. Run the FastAPI application:
 ```bash
