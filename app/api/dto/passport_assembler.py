@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from app.api.dto.AssemblerRegistry import AssemblerRegistry
-from app.api.dto.CredentialAssembler import CredentialAssembler
-from app.api.dto.CredentialDTO import CredentialDTO
-from app.domain.Passport import Passport
-from app.api.dto.PassportDTO import PassportDTO
+from app.api.dto.assembler_registry import AssemblerRegistry
+from app.api.dto.credential_assembler import CredentialAssembler
+from app.api.dto.credential_dto import CredentialDTO
+from app.domain.passport import Passport
+from app.api.dto.passport_dto import PassportDTO
 
 @AssemblerRegistry.register("passport")
 class PassportAssembler(CredentialAssembler):

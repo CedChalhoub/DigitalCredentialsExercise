@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from app.api.dto.AssemblerRegistry import AssemblerRegistry
-from app.api.dto.CredentialAssembler import CredentialAssembler
-from app.api.dto.CredentialDTO import CredentialDTO
-from app.api.dto.DriversLicenseDTO import DriversLicenseDTO
-from app.domain.DriversLicense import DriversLicense
+from app.api.dto.assembler_registry import AssemblerRegistry
+from app.api.dto.credential_assembler import CredentialAssembler
+from app.api.dto.credential_dto import CredentialDTO
+from app.api.dto.drivers_license_dto import DriversLicenseDTO
+from app.domain.drivers_license import DriversLicense
 
 @AssemblerRegistry.register("drivers_license")
 class DriversLicenseAssembler(CredentialAssembler):

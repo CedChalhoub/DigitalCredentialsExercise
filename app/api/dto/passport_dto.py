@@ -1,4 +1,4 @@
-from app.api.dto.CredentialDTO import CredentialDTO
+from app.api.dto.credential_dto import CredentialDTO
 
 
 class PassportDTO(CredentialDTO):

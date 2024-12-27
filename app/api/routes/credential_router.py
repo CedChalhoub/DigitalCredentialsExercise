@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, Query, Body
 from fastapi.responses import JSONResponse
 
-from app.api.dto.AssemblerRegistry import AssemblerRegistry
-from app.api.dto.StatusUpdateDTO import StatusUpdateDTO
-from app.application.CredentialService import CredentialService
+from app.api.dto.assembler_registry import AssemblerRegistry
+from app.api.dto.status_update_dto import StatusUpdateDTO
+from app.application.credential_service import CredentialService
 from app.dependencies import get_credential_service
-from app.domain.Credential import Credential
-from app.domain.CredentialStatus import CredentialStatus
-from app.domain.CredentialType import CredentialType
+from app.domain.credential import Credential
+from app.domain.credential_status import CredentialStatus
+from app.domain.credential_type import CredentialType
 
 class CredentialRouter:
     def __init__(self, assembler_registry: AssemblerRegistry):
