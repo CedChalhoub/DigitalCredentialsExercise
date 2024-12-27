@@ -49,7 +49,7 @@ Resources:
     Properties:
       StageName: prod
       Cors:
-        AllowMethods: "'GET,POST'"
+        AllowMethods: "'GET,POST, PATCH'"
         AllowHeaders: "'Content-Type'"
         AllowOrigin: "'*'"
 

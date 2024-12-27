@@ -1,10 +1,17 @@
 version = 0.1
 [default]
 [default.local_start_api]
-environment_variables = [
-  "DYNAMODB_TABLE=local-credential-status",
-  "REPOSITY_TYPE=dynamodb"
+environment_variables=[
+  "DYNAMODB_TABLE=Credentials",
+  "DYNAMODB_ENDPOINT_URL=http://host.docker.internal:8000",
+  "REPOSITORY_TYPE=dynamodb",
+  "AWS_ACCESS_KEY_ID=dummy",
+  "AWS_SECRET_ACCESS_KEY=dummy",
+  "AWS_DEFAULT_REGION=us-east-1",
+  "AWS_SAM_LOCAL=true"
 ]
-AWS_ACCESS_KEY_ID = "dummy"
-AWS_SECRET_ACCESS_KEY = "dummy"
-AWS_DEFAULT_REGION = "us-east-1"
+[default.deploy]
+environment_variables=[
+  "AWS_SAM_LOCAL=false",
+  "AWS_DEFAULT_REGION=us-east-1"
+]

@@ -9,22 +9,13 @@ import boto3
 from app.domain.credential import Credential
 from app.domain.credential_repository import AbstractCredentialRepository
 from app.domain.credential_type import CredentialType
+from app.infrastructure.database.dynamodb_manager import DynamoDBManager
 from app.infrastructure.mapper_factory import MapperFactory
 
 
 class DynamoDBCredentialRepository(AbstractCredentialRepository):
-    def __init__(self):
-        self.dynamodb = boto3.resource(
-            'dynamodb',
-            endpoint_url='http://host.docker.internal:8000',  # Using 127.0.0.1 instead of localhost
-            region_name='local',
-            aws_access_key_id='dummy',
-            aws_secret_access_key='dummy',
-            config=Config(
-                retries=dict(
-                    max_attempts=1  # Fail fast in local development
-                )
-            ) )
+    def __init__(self, db_manager: DynamoDBManager):
+        self.dynamodb = db_manager.client
         self._table = self.create_credentials_table()
         self._mapperFactory = MapperFactory()
 

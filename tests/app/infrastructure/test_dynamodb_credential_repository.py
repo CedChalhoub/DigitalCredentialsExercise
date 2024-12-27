@@ -5,20 +5,27 @@ from botocore.exceptions import ClientError
 from app.domain.credential_type import CredentialType
 from app.domain.drivers_license import DriversLicense
 from app.infrastructure.dynamodb_credential_repository import DynamoDBCredentialRepository
+from app.infrastructure.database.database_config import DatabaseConfig
+from app.infrastructure.database.dynamodb_manager import DynamoDBManager
 
 
 @pytest.fixture
-def mock_table():
-    return Mock()
-
-
-@pytest.fixture
-def mock_dynamodb():
+def mock_db_manager():
     with patch('boto3.resource') as mock_resource:
         mock_table = Mock()
         mock_resource.return_value.Table.return_value = mock_table
         mock_resource.return_value.create_table.return_value = mock_table
-        yield mock_resource
+
+        config = DatabaseConfig(
+            endpoint_url='http://localhost:8000',
+            region='local',
+            access_key_id='dummy',
+            secret_access_key='dummy'
+        )
+        db_manager = DynamoDBManager(config)
+        # Set the private attribute instead of the property
+        db_manager._dynamodb = mock_resource.return_value
+        return db_manager
 
 
 @pytest.fixture
@@ -47,36 +54,37 @@ def dynamo_item():
         'vehicle_classes': ['A', 'B'],
         'issuing_province': 'ON',
         'suspension_reason': None,
-        'revocation_reason': None
+        'revocation_reason': None,
+        'version': 1
     }
 
 
 class TestDynamoDBCredentialRepository:
-    def test_get_credential_success(self, mock_dynamodb, dynamo_item):
-        repo = DynamoDBCredentialRepository()
-        repo._table.get_item.return_value = {'Item': dynamo_item}
+    def test_get_credential_success(self, mock_db_manager, dynamo_item):
+        repo = DynamoDBCredentialRepository(mock_db_manager)
+        mock_db_manager._dynamodb.Table().get_item.return_value = {'Item': dynamo_item}
 
         credential = repo.get_credential("test-issuer-123", CredentialType.DRIVERS_LICENSE)
 
         assert credential.issuer_id == "test-issuer-123"
         assert credential.holder_id == "test-holder-456"
-        repo._table.get_item.assert_called_once_with(
+        mock_db_manager._dynamodb.Table().get_item.assert_called_once_with(
             Key={
                 'PK': 'CRED#test-issuer-123',
                 'SK': 'METADATA#drivers_license'
             }
         )
 
-    def test_get_credential_not_found(self, mock_dynamodb):
-        repo = DynamoDBCredentialRepository()
-        repo._table.get_item.return_value = {'Item': None}
+    def test_get_credential_not_found(self, mock_db_manager):
+        repo = DynamoDBCredentialRepository(mock_db_manager)
+        mock_db_manager._dynamodb.Table().get_item.return_value = {}
 
         result = repo.get_credential("nonexistent", CredentialType.DRIVERS_LICENSE)
         assert result is None
 
-    def test_get_credential_client_error(self, mock_dynamodb):
-        repo = DynamoDBCredentialRepository()
-        repo._table.get_item.side_effect = ClientError(
+    def test_get_credential_client_error(self, mock_db_manager):
+        repo = DynamoDBCredentialRepository(mock_db_manager)
+        mock_db_manager._dynamodb.Table().get_item.side_effect = ClientError(
             error_response={'Error': {'Message': 'Test error'}},
             operation_name='GetItem'
         )
@@ -84,19 +92,19 @@ class TestDynamoDBCredentialRepository:
         result = repo.get_credential("test-id", CredentialType.DRIVERS_LICENSE)
         assert result is None
 
-    def test_create_credential(self, mock_dynamodb, sample_drivers_license):
-        repo = DynamoDBCredentialRepository()
+    def test_create_credential(self, mock_db_manager, sample_drivers_license):
+        repo = DynamoDBCredentialRepository(mock_db_manager)
 
         repo.create_credential(sample_drivers_license)
 
-        repo._table.put_item.assert_called_once()
-        put_item_args = repo._table.put_item.call_args[1]['Item']
+        mock_db_manager._dynamodb.Table().put_item.assert_called_once()
+        put_item_args = mock_db_manager._dynamodb.Table().put_item.call_args[1]['Item']
         assert put_item_args['PK'] == f'CRED#{sample_drivers_license.issuer_id}'
         assert put_item_args['SK'] == 'METADATA#drivers_license'
 
-    def test_create_credential_error(self, mock_dynamodb, sample_drivers_license):
-        repo = DynamoDBCredentialRepository()
-        repo._table.put_item.side_effect = ClientError(
+    def test_create_credential_error(self, mock_db_manager, sample_drivers_license):
+        repo = DynamoDBCredentialRepository(mock_db_manager)
+        mock_db_manager._dynamodb.Table().put_item.side_effect = ClientError(
             error_response={'Error': {'Message': 'Test error'}},
             operation_name='PutItem'
         )
@@ -104,22 +112,22 @@ class TestDynamoDBCredentialRepository:
         with pytest.raises(ClientError):
             repo.create_credential(sample_drivers_license)
 
-    def test_update_credential_status(self, mock_dynamodb, sample_drivers_license):
-        repo = DynamoDBCredentialRepository()
+    def test_update_credential_status(self, mock_db_manager, sample_drivers_license):
+        repo = DynamoDBCredentialRepository(mock_db_manager)
         sample_drivers_license.suspend("Test suspension")
 
         repo.update_credential_status(sample_drivers_license)
 
-        repo._table.update_item.assert_called_once()
-        update_args = repo._table.update_item.call_args[1]
+        mock_db_manager._dynamodb.Table().update_item.assert_called_once()
+        update_args = mock_db_manager._dynamodb.Table().update_item.call_args[1]
         assert update_args['Key']['PK'] == f'CRED#{sample_drivers_license.issuer_id}'
         assert update_args['Key']['SK'] == 'METADATA#drivers_license'
         assert update_args['ExpressionAttributeValues'][':status'] == 'suspended'
         assert update_args['ExpressionAttributeValues'][':suspension_reason'] == 'Test suspension'
 
-    def test_update_credential_status_error(self, mock_dynamodb, sample_drivers_license):
-        repo = DynamoDBCredentialRepository()
-        repo._table.update_item.side_effect = ClientError(
+    def test_update_credential_status_error(self, mock_db_manager, sample_drivers_license):
+        repo = DynamoDBCredentialRepository(mock_db_manager)
+        mock_db_manager._dynamodb.Table().update_item.side_effect = ClientError(
             error_response={'Error': {'Message': 'Test error'}},
             operation_name='UpdateItem'
         )
