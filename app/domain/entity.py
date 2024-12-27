@@ -1,7 +1,7 @@
 from uuid import UUID
 
-from app.domain.Credential import Credential
-from app.domain.EntityType import EntityType
+from app.domain.credential import Credential
+from app.domain.entity_type import EntityType
 
 
 class Entity:

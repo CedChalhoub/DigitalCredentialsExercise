@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from app.domain.Credential import Credential
+from app.domain.credential import Credential
 
 
 class AbstractCredentialMapper(ABC):

@@ -1,10 +1,10 @@
 from abc import ABC
 from datetime import datetime, UTC
 
-from app.domain.CredentialStatus import CredentialStatus
-from app.domain.CredentialType import CredentialType
-from app.domain.Passport import Passport
-from app.application.AbstractCredentialMapper import AbstractCredentialMapper
+from app.domain.credential_status import CredentialStatus
+from app.domain.credential_type import CredentialType
+from app.domain.passport import Passport
+from app.application.credential_mapper import AbstractCredentialMapper
 
 class PassportMapper(AbstractCredentialMapper, ABC):
     def to_dynamo(self, credential: Passport) -> dict:

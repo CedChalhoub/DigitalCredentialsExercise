@@ -3,13 +3,13 @@ from datetime import datetime, UTC
 from botocore.exceptions import ClientError
 from botocore.config import Config
 
-from app.application.AbstractCredentialMapper import AbstractCredentialMapper
-from app.domain import Credential
+from app.application.credential_mapper import AbstractCredentialMapper
 import boto3
 
-from app.domain.AbstractCredentialRepository import AbstractCredentialRepository
-from app.domain.CredentialType import CredentialType
-from app.infrastructure.MapperFactory import MapperFactory
+from app.domain.credential import Credential
+from app.domain.credential_repository import AbstractCredentialRepository
+from app.domain.credential_type import CredentialType
+from app.infrastructure.mapper_factory import MapperFactory
 
 
 class DynamoDBCredentialRepository(AbstractCredentialRepository):
@@ -28,7 +28,7 @@ class DynamoDBCredentialRepository(AbstractCredentialRepository):
         self._table = self.create_credentials_table()
         self._mapperFactory = MapperFactory()
 
-    def get_credential(self, credential_id: str, credential_type: CredentialType) -> Credential:
+    def get_credential(self, credential_id: str, credential_type: CredentialType) -> Credential | None:
         try:
             response = self._table.get_item(
                 Key={

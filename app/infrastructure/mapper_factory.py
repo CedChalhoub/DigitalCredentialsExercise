@@ -1,6 +1,6 @@
-from app.domain.CredentialType import CredentialType
-from app.infrastructure.DriversLicenseMapper import DriversLicenseMapper
-from app.infrastructure.PassportMapper import PassportMapper
+from app.domain.credential_type import CredentialType
+from app.infrastructure.drivers_license_mapper import DriversLicenseMapper
+from app.infrastructure.passport_mapper import PassportMapper
 
 
 class MapperFactory:

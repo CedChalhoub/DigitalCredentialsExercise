@@ -1,11 +1,11 @@
 from abc import abstractmethod, ABC
-from datetime import datetime, timezone
+from datetime import datetime, timezone, UTC
 from typing import Optional, List
 from uuid import UUID
 
-from app.domain.CredentialStatus import CredentialStatus
-from app.domain.CredentialType import CredentialType
-from app.domain.EntityType import EntityType
+from app.domain.credential_status import CredentialStatus
+from app.domain.credential_type import CredentialType
+from app.domain.entity_type import EntityType
 
 
 class Credential(ABC):
@@ -73,9 +73,10 @@ class Credential(ABC):
         self.set_revocation_reason(reason)
 
     def is_valid(self) -> bool:
+        now = datetime.now(UTC)
         return ((self._status == CredentialStatus.ACTIVE)
-                and (datetime.now() >= self._valid_from)
-                and (datetime.now() <= self._valid_until))
+                and (now >= self._valid_from)
+                and (now <= self._valid_until))
 
     def set_suspension_reason(self, reason: str | None):
         self._suspension_reason = reason
@@ -102,7 +103,7 @@ class Credential(ABC):
     def revocation_reason(self):
         return self._revocation_reason
 
-    def update_status(self, status: CredentialStatus, reason: str) -> None:
+    def update_status(self, status: CredentialStatus, reason: str | None) -> None:
         match status:
             case CredentialStatus.SUSPENDED:
                 self.suspend(reason)

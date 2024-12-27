@@ -1,7 +1,8 @@
-from app.domain import Credential
-from app.domain.CredentialStatus import CredentialStatus
-from app.domain.AbstractCredentialRepository import AbstractCredentialRepository
-from app.domain.CredentialType import CredentialType
+
+from app.domain.credential import Credential
+from app.domain.credential_status import CredentialStatus
+from app.domain.credential_repository import AbstractCredentialRepository
+from app.domain.credential_type import CredentialType
 
 class CredentialService:
     def __init__(self, repository: AbstractCredentialRepository):

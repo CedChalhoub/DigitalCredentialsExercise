@@ -1,7 +1,7 @@
 from abc import abstractmethod
 
-from app.domain import Credential
-from app.domain.CredentialType import CredentialType
+from app.domain.credential import Credential
+from app.domain.credential_type import CredentialType
 
 
 class AbstractCredentialRepository:

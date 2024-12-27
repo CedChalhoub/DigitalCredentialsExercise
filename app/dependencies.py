@@ -2,10 +2,10 @@ import os
 from fastapi import Depends
 from typing import Annotated
 
-from app.domain.AbstractCredentialRepository import AbstractCredentialRepository
-from app.infrastructure.DynamoDBCredentialRepository import DynamoDBCredentialRepository
-from app.application.CredentialService import CredentialService
-from app.api.dto.AssemblerRegistry import AssemblerRegistry
+from app.domain.credential_repository import AbstractCredentialRepository
+from app.infrastructure.dynamodb_credential_repository import DynamoDBCredentialRepository
+from app.application.credential_service import CredentialService
+from app.api.dto.assembler_registry import AssemblerRegistry
 
 def get_repository() -> AbstractCredentialRepository:
     """Get repository implementation based on environment"""

@@ -2,9 +2,9 @@ from abc import ABC
 from datetime import datetime
 from typing import List
 
-from app.domain.Credential import Credential
-from app.domain.CredentialType import CredentialType
-from app.domain.EntityType import EntityType
+from app.domain.credential import Credential
+from app.domain.credential_type import CredentialType
+from app.domain.entity_type import EntityType
 
 
 class DriversLicense(Credential, ABC):
