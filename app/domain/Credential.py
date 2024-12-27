@@ -10,7 +10,7 @@ from app.domain.EntityType import EntityType
 
 class Credential(ABC):
 
-    def __init__(self, issuer_id: UUID, holder_id: str, valid_from: datetime, valid_until: datetime):
+    def __init__(self, issuer_id: str, holder_id: str, valid_from: datetime, valid_until: datetime):
         self._issuer_id = issuer_id
         self._holder_id = holder_id
 

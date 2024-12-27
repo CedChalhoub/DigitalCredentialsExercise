@@ -1,13 +1,13 @@
+from typing import Dict
+
 from fastapi import APIRouter, Depends, Query, Body
 from fastapi.responses import JSONResponse
 
 from app.api.dto.AssemblerRegistry import AssemblerRegistry
-from app.api.dto.DriversLicenseDTO import DriversLicenseDTO
-from app.api.dto.PassportDTO import PassportDTO
 from app.application.CredentialService import CredentialService
-from app.api.dto.CredentialDTO import CredentialDTO
 from app.dependencies import get_credential_service
 from app.domain.Credential import Credential
+from app.domain.CredentialStatus import CredentialStatus
 from app.domain.CredentialType import CredentialType
 
 class CredentialRouter:
@@ -30,18 +30,25 @@ class CredentialRouter:
         async def get_heartbeat():
             return {"message": "Service is up and running"}
 
-        # TODO: Implement DTO
         @self._router.get("/credentials/{credential_id}")
         async def get_credential(
                 credential_id: str,
                 credential_type: str = Query(..., description="Type of credential to get"),
                 service: CredentialService = Depends(get_credential_service)):
-
+            assembler = self.assembler_registry.get_assembler(credential_type)
             credential: Credential = service.get_credential(credential_id, CredentialType(credential_type))
-            print(credential)
-            # TODO: Map credential domain model to response dto to show specific info
 
-            return credential
+            return assembler.to_dto(credential)
+
+        @self._router.get("/credentials/validate/{credential_id}")
+        async def validate_credential(
+                credential_id: str,
+                credential_type: str = Query(..., description="Type of credential to validate"),
+                service: CredentialService = Depends(get_credential_service)):
+            credential_status: CredentialStatus = service.validate_credential(credential_id, CredentialType(credential_type))
+
+            return JSONResponse(content={"id": credential_id, "status": credential_status.value},
+                                status_code=200)
 
         @self._router.post("/credentials")
         async def create_credential(
@@ -55,4 +62,7 @@ class CredentialRouter:
 
             service.create_credential(credential)
 
-            return JSONResponse(content={"message": "Credential created"}, status_code=201)
+            return JSONResponse(content={"message": "Credential created"},
+                                status_code=201)
+
+
