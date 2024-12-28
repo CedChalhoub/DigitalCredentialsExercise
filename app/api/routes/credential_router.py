@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, Query, Body
+
+from fastapi import APIRouter, Depends, Query, Body, HTTPException
 from fastapi.responses import JSONResponse
 
 from app.api.dto.assembler_registry import AssemblerRegistry
@@ -34,6 +35,7 @@ class CredentialRouter:
                 credential_id: str,
                 credential_type: str = Query(..., description="Type of credential to get"),
                 service: CredentialService = Depends(get_credential_service)):
+
             assembler = self.assembler_registry.get_assembler(credential_type)
             credential: Credential = service.get_credential(credential_id, CredentialType(credential_type))
 
@@ -71,7 +73,7 @@ class CredentialRouter:
                 status_update_dict: dict = Body(...),
                 service: CredentialService = Depends(get_credential_service)):
 
-            credential: Credential = service.update_credential(credential_id,
+            service.update_credential(credential_id,
                                                                CredentialType(credential_type),
                                                                CredentialStatus(status_update_dict.get("status")),
                                                                status_update_dict.get("reason"))

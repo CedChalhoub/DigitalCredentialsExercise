@@ -4,6 +4,7 @@ from app.domain.credential import Credential
 from app.domain.credential_status import CredentialStatus
 from app.domain.credential_type import CredentialType
 from app.domain.entity_type import EntityType
+from app.domain.exceptions.credential.expired_credential_exception import ExpiredCredentialException
 from typing import List
 
 
@@ -95,14 +96,17 @@ class TestCredentialBase:
         assert credential.is_valid() is False
 
     def test_is_valid_dates(self, valid_dates):
+        # Test past credential
         past_credential = ConcreteTestCredential(
             issuer_id="test",
             holder_id="test",
             valid_from=valid_dates['valid_from'] - timedelta(days=730),
             valid_until=valid_dates['valid_from'] - timedelta(days=365)
         )
-        assert past_credential.is_valid() is False
+        with pytest.raises(ExpiredCredentialException):
+            past_credential.is_valid()
 
+        # Test future credential
         future_credential = ConcreteTestCredential(
             issuer_id="test",
             holder_id="test",

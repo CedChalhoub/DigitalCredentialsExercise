@@ -1,15 +1,15 @@
 from datetime import datetime, UTC
 
 from botocore.exceptions import ClientError
-from botocore.config import Config
 
 from app.application.credential_mapper import AbstractCredentialMapper
-import boto3
 
 from app.domain.credential import Credential
 from app.domain.credential_repository import AbstractCredentialRepository
 from app.domain.credential_type import CredentialType
+from app.domain.exceptions.credential.credential_not_found_exception import CredentialNotFoundException
 from app.infrastructure.database.dynamodb_manager import DynamoDBManager
+from app.infrastructure.exceptions.database_exception import DatabaseException
 from app.infrastructure.mapper_factory import MapperFactory
 
 
@@ -26,21 +26,21 @@ class DynamoDBCredentialRepository(AbstractCredentialRepository):
                     'PK': f'CRED#{credential_id}',
                     'SK': f'METADATA#{credential_type.value}'
                 })
-            print(response)
+
             item = response.get('Item')
 
             if not item:
-                return None
+                raise CredentialNotFoundException(credential_id, credential_type.value)
 
             mapper = self._mapperFactory.get_mapper(CredentialType(item.get('credential_type')))
             credential = mapper.to_domain(item)
             return credential
-        except ClientError as e:
-            print(f"Error getting item from DynamoDB: {e.response['Error']['Message']}")
-            return None
-
-        except Exception as e:
-            print(f"Unexpected error: {str(e)}")
+        except CredentialNotFoundException:
+            # Let CredentialNotFoundException bubble up
+            raise
+        except (ClientError, Exception) as e:
+            raise DatabaseException(
+                f"Error getting credential: {str(e)}")
 
     def create_credentials_table(self):
         """
@@ -82,18 +82,17 @@ class DynamoDBCredentialRepository(AbstractCredentialRepository):
         except ClientError as e:
             if e.response['Error']['Code'] == 'ResourceInUseException':
                 return self.dynamodb.Table('Credentials')
-            else:
-                raise
+            raise DatabaseException(f"Error creating table: {str(e)}")
+        except Exception as e:
+            raise DatabaseException(f"Error creating table: {str(e)}")
     def create_credential(self, credential: Credential):
         try:
             credential_mapper: AbstractCredentialMapper = self._mapperFactory.get_mapper(credential.get_credential_type())
             credential_item = credential_mapper.to_dynamo(credential)
             response = self._table.put_item(Item=credential_item)
-            print("Sample credential inserted successfully!")
             return response
-        except ClientError as e:
-            print(f"Error putting item: {e}")
-            raise
+        except (ClientError, Exception) as e:
+            raise DatabaseException(f"Error creating credential: {str(e)}")
 
     def update_credential_status(self, credential: Credential) -> None:
         update_expression = """
@@ -121,8 +120,6 @@ class DynamoDBCredentialRepository(AbstractCredentialRepository):
                 },
                 ReturnValues="UPDATED_NEW"
             )
-            print(response)
             return response
-        except ClientError as e:
-            print(f"Error updating item in DynamoDB: {e.response['Error']['Message']}")
-            raise
+        except (ClientError, Exception) as e:
+            raise DatabaseException(f"Error updating item in DynamoDB: {e.response['Error']['Message']}")

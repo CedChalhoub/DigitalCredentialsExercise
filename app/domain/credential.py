@@ -6,6 +6,8 @@ from uuid import UUID
 from app.domain.credential_status import CredentialStatus
 from app.domain.credential_type import CredentialType
 from app.domain.entity_type import EntityType
+from app.domain.exceptions.credential.expired_credential_exception import ExpiredCredentialException
+from app.domain.exceptions.credential.invalid_credential_state_exception import InvalidCredentialStateException
 
 
 class Credential(ABC):
@@ -18,6 +20,9 @@ class Credential(ABC):
             raise ValueError("valid_from must be timezone-aware")
         if valid_until.tzinfo is None:
             raise ValueError("valid_until must be timezone-aware")
+
+        if valid_until < valid_from:
+            raise InvalidCredentialStateException("valid_until must be after valid_from")
 
         self._valid_from = valid_from.astimezone(timezone.utc)
         self._valid_until = valid_until.astimezone(timezone.utc)
@@ -57,23 +62,34 @@ class Credential(ABC):
         pass
 
     def suspend(self, reason: str) -> None:
-        # TODO: Add validation
+        if not reason:
+            raise InvalidCredentialStateException("Suspension reason cannot be empty")
+
+        if self._status == CredentialStatus.REVOKED:
+            raise InvalidCredentialStateException("Cannot suspend a revoked credential")
         self._status = CredentialStatus.SUSPENDED
         self.set_suspension_reason(reason)
 
     def reinstate(self) -> None:
-        # TODO: Add validation
+        if self._status == CredentialStatus.REVOKED:
+            raise InvalidCredentialStateException("Cannot reinstate a revoked credential")
+
         self._status = CredentialStatus.ACTIVE
         self.set_suspension_reason(None)
         self.set_suspension_reason(None)
 
     def revoke(self, reason: str) -> None :
-        # TODO: Add validation
+        if not reason:
+            raise InvalidCredentialStateException("Revocation reason cannot be empty")
         self._status = CredentialStatus.REVOKED
         self.set_revocation_reason(reason)
 
     def is_valid(self) -> bool:
         now = datetime.now(UTC)
+
+        if now > self._valid_until:
+            raise ExpiredCredentialException(self._valid_until)
+
         return ((self._status == CredentialStatus.ACTIVE)
                 and (now >= self._valid_from)
                 and (now <= self._valid_until))

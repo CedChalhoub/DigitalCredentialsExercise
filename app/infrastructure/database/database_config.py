@@ -13,7 +13,6 @@ class DatabaseConfig:
     @classmethod
     def from_environment(cls) -> 'DatabaseConfig':
         is_local = os.getenv('AWS_SAM_LOCAL') == 'true'
-
         region = os.getenv('AWS_DEFAULT_REGION', 'us-east-1').lower()
 
         if is_local:
@@ -23,9 +22,6 @@ class DatabaseConfig:
                 access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
                 secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
             )
-            print(f"\nFinal config:")
-            print(f"endpoint_url: {config.endpoint_url}")
-            print(f"region: {config.region}")
             return config
 
         return cls(

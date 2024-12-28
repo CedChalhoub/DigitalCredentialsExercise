@@ -4,12 +4,16 @@ from app.api.dto.assembler_registry import AssemblerRegistry
 from app.api.dto.credential_assembler import CredentialAssembler
 from app.api.dto.credential_dto import CredentialDTO
 from app.api.dto.drivers_license_dto import DriversLicenseDTO
+from app.api.exceptions.invalid_credential_data_exception import InvalidCredentialDataException
 from app.domain.drivers_license import DriversLicense
 
 @AssemblerRegistry.register("drivers_license")
 class DriversLicenseAssembler(CredentialAssembler):
     def _to_specific_dto(self, credential_dict: dict) -> DriversLicenseDTO:
-        return DriversLicenseDTO(**credential_dict)
+        try:
+            return DriversLicenseDTO(**credential_dict)
+        except ValueError as e:
+            raise InvalidCredentialDataException("format", str(e))
     def to_dto(self, drivers_license: DriversLicense) -> DriversLicenseDTO:
         return DriversLicenseDTO(
             issuer_id=str(drivers_license.issuer_id),

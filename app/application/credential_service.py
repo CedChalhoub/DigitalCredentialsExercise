@@ -1,4 +1,3 @@
-
 from app.domain.credential import Credential
 from app.domain.credential_status import CredentialStatus
 from app.domain.credential_repository import AbstractCredentialRepository
@@ -22,7 +21,6 @@ class CredentialService:
         credential: Credential = self._repository.get_credential(credential_id, credential_type)
         credential.update_status(new_status, update_reason)
         self._repository.update_credential_status(credential)
-        print(credential)
         return credential
 
 

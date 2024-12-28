@@ -4,6 +4,8 @@ from unittest.mock import Mock, patch
 from botocore.exceptions import ClientError
 from app.domain.credential_type import CredentialType
 from app.domain.drivers_license import DriversLicense
+from app.domain.exceptions.credential.credential_not_found_exception import CredentialNotFoundException
+from app.infrastructure.exceptions.database_exception import DatabaseException
 from app.infrastructure.dynamodb_credential_repository import DynamoDBCredentialRepository
 from app.infrastructure.database.database_config import DatabaseConfig
 from app.infrastructure.database.dynamodb_manager import DynamoDBManager
@@ -79,8 +81,8 @@ class TestDynamoDBCredentialRepository:
         repo = DynamoDBCredentialRepository(mock_db_manager)
         mock_db_manager._dynamodb.Table().get_item.return_value = {}
 
-        result = repo.get_credential("nonexistent", CredentialType.DRIVERS_LICENSE)
-        assert result is None
+        with pytest.raises(CredentialNotFoundException):
+            repo.get_credential("nonexistent", CredentialType.DRIVERS_LICENSE)
 
     def test_get_credential_client_error(self, mock_db_manager):
         repo = DynamoDBCredentialRepository(mock_db_manager)
@@ -89,8 +91,8 @@ class TestDynamoDBCredentialRepository:
             operation_name='GetItem'
         )
 
-        result = repo.get_credential("test-id", CredentialType.DRIVERS_LICENSE)
-        assert result is None
+        with pytest.raises(DatabaseException):
+            repo.get_credential("test-id", CredentialType.DRIVERS_LICENSE)
 
     def test_create_credential(self, mock_db_manager, sample_drivers_license):
         repo = DynamoDBCredentialRepository(mock_db_manager)
@@ -109,7 +111,7 @@ class TestDynamoDBCredentialRepository:
             operation_name='PutItem'
         )
 
-        with pytest.raises(ClientError):
+        with pytest.raises(DatabaseException):
             repo.create_credential(sample_drivers_license)
 
     def test_update_credential_status(self, mock_db_manager, sample_drivers_license):
@@ -132,5 +134,5 @@ class TestDynamoDBCredentialRepository:
             operation_name='UpdateItem'
         )
 
-        with pytest.raises(ClientError):
+        with pytest.raises(DatabaseException):
             repo.update_credential_status(sample_drivers_license)
