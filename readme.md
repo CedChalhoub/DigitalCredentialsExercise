@@ -37,11 +37,12 @@ REST API for managing digital credentials (passports, driver's licenses, etc.) w
     ```bash
     java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
     ```
-    Note: Requires Java Runtime Environment (JRE) version 8.x or newer
+   Note: Requires Java Runtime Environment (JRE) version 8.x or newer
+
 
 3. Run the FastAPI application:
     ```bash
-    sam local start-interfaces
+    sam local start-api
     ```
 
 The API will be available at `http://localhost:3000`
