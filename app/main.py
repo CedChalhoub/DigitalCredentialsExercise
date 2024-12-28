@@ -1,12 +1,10 @@
 from mangum import Mangum
 from fastapi import FastAPI
 
-from app.api.dto.assembler_registry import AssemblerRegistry
+from app.interfaces.rest.dto.assembler_registry import AssemblerRegistry
 
-from app.api.dto.passport_assembler import PassportAssembler
-from app.api.dto.drivers_license_assembler import DriversLicenseAssembler
-from app.api.exceptions.middleware import setup_exception_handlers
-from app.api.routes.credential_router import CredentialRouter
+from app.interfaces.rest.exceptions.middleware import setup_exception_handlers
+from app.interfaces.rest.routes.credential_router import CredentialRouter
 
 
 def create_app() -> FastAPI:

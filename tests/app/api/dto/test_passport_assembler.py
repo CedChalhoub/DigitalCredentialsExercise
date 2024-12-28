@@ -1,9 +1,9 @@
 import pytest
 from datetime import datetime, UTC
 
-from app.api.dto.passport_assembler import PassportAssembler
-from app.domain.credential_status import CredentialStatus
-from app.domain.passport import Passport
+from app.interfaces.rest.dto.passport_assembler import PassportAssembler
+from app.domain.enums.credential_status import CredentialStatus
+from app.domain.models.passport import Passport
 
 
 @pytest.fixture

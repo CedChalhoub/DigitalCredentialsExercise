@@ -12,7 +12,7 @@ REST API for managing digital credentials (passports, driver's licenses, etc.) w
 ## Prerequisites
 
 - Python 3.9+
-- Docker
+- Docker (installed and running)
 - AWS CLI configured
 - DynamoDB Local (for development)
 
@@ -20,28 +20,29 @@ REST API for managing digital credentials (passports, driver's licenses, etc.) w
 
 1. Clone the repository
 2. Create a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-.\venv\Scripts\activate   # Windows
-```
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # Linux/Mac
+    .\venv\Scripts\activate   # Windows
+    ```
 3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 ## Local Development
 
-1. Start DynamoDB Local:
-```bash
-java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
-```
-Note: Requires Java Runtime Environment (JRE) version 8.x or newer
+1. Ensure Docker is running on your machine
+2. Start DynamoDB Local:
+    ```bash
+    java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
+    ```
+    Note: Requires Java Runtime Environment (JRE) version 8.x or newer
 
-2. Run the FastAPI application:
-```bash
-sam local start-api
-```
+3. Run the FastAPI application:
+    ```bash
+    sam local start-interfaces
+    ```
 
 The API will be available at `http://localhost:3000`
 
@@ -112,26 +113,26 @@ Update a credential's status.
 ## Testing
 
 Run unit tests:
-```bash
-pytest
-```
+    ```bash
+    pytest
+    ```
 
 Run integration tests:
-```bash
-pytest tests/integration
-```
+    ```bash
+    pytest tests/integration
+    ```
 
 ## AWS Deployment
 
 1. Package the application:
-```bash
-sam build
-```
+    ```bash
+    sam build
+    ```
 
 2. Deploy to AWS:
-```bash
-sam deploy --guided
-```
+    ```bash
+    sam deploy --guided
+    ```
 
 This will deploy:
 - API Gateway

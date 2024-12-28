@@ -1,9 +1,9 @@
 import pytest
 from datetime import datetime, UTC
 
-from app.api.dto.drivers_license_assembler import DriversLicenseAssembler
-from app.domain.credential_status import CredentialStatus
-from app.domain.drivers_license import DriversLicense
+from app.interfaces.rest.dto.drivers_license_assembler import DriversLicenseAssembler
+from app.domain.enums.credential_status import CredentialStatus
+from app.domain.models.drivers_license import DriversLicense
 
 
 @pytest.fixture

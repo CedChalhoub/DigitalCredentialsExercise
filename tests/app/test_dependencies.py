@@ -1,10 +1,10 @@
 import pytest
 from unittest.mock import patch, Mock
 from app.dependencies import get_credential_service
-from app.infrastructure.dynamodb_credential_repository import DynamoDBCredentialRepository
-from app.application.credential_service import CredentialService
-from app.infrastructure.database.database_config import DatabaseConfig
-from app.infrastructure.database.dynamodb_manager import DynamoDBManager
+from app.infrastructure.persistence.repositories.dynamodb_credential_repository import DynamoDBCredentialRepository
+from app.application.services.credential_service import CredentialService
+from app.infrastructure.persistence.dynamodb.database_config import DatabaseConfig
+from app.infrastructure.persistence.dynamodb.dynamodb_manager import DynamoDBManager
 
 
 @pytest.fixture

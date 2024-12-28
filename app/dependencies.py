@@ -1,12 +1,12 @@
 from fastapi import Depends
 from typing import Annotated
 
-from app.domain.credential_repository import AbstractCredentialRepository
-from app.infrastructure.database.database_config import DatabaseConfig
-from app.infrastructure.database.dynamodb_manager import DynamoDBManager
-from app.infrastructure.dynamodb_credential_repository import DynamoDBCredentialRepository
-from app.application.credential_service import CredentialService
-from app.api.dto.assembler_registry import AssemblerRegistry
+from app.domain.repositories.credential_repository import AbstractCredentialRepository
+from app.infrastructure.persistence.dynamodb.database_config import DatabaseConfig
+from app.infrastructure.persistence.dynamodb.dynamodb_manager import DynamoDBManager
+from app.infrastructure.persistence.repositories.dynamodb_credential_repository import DynamoDBCredentialRepository
+from app.application.services.credential_service import CredentialService
+from app.interfaces.rest.dto.assembler_registry import AssemblerRegistry
 
 def get_db_config() -> DatabaseConfig:
     return DatabaseConfig.from_environment()

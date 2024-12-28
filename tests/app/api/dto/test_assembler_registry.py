@@ -1,9 +1,9 @@
 import pytest
 from fastapi import HTTPException
-from app.api.dto.assembler_registry import AssemblerRegistry
-from app.api.dto.credential_assembler import CredentialAssembler
-from app.domain.credential import Credential
-from app.api.dto.credential_dto import CredentialDTO
+from app.interfaces.rest.dto.assembler_registry import AssemblerRegistry
+from app.interfaces.rest.dto.credential_assembler import CredentialAssembler
+from app.domain.models.credential import Credential
+from app.interfaces.rest.dto.credential_dto import CredentialDTO
 
 
 # Test fixtures
