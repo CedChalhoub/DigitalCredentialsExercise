@@ -113,14 +113,10 @@ Update a credential's status.
 ## Testing
 
 Run unit tests:
-    ```bash
-    pytest
+    ```
+    python -m pytest tests/
     ```
 
-Run integration tests:
-    ```bash
-    pytest tests/integration
-    ```
 
 ## AWS Deployment
 
