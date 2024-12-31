@@ -11,7 +11,7 @@ from app.domain.exceptions.credential.invalid_credential_state_exception import 
 
 class Credential(ABC):
 
-    def __init__(self, issuer_id: str, holder_id: str, valid_from: datetime, valid_until: datetime):
+    def __init__(self, issuer_id: str, holder_id: str, valid_from: datetime, valid_until: datetime, issuing_country: str):
         self._issuer_id = issuer_id
         self._holder_id = holder_id
 
@@ -26,6 +26,7 @@ class Credential(ABC):
         self._valid_from = valid_from.astimezone(timezone.utc)
         self._valid_until = valid_until.astimezone(timezone.utc)
         self._status = CredentialStatus.ACTIVE
+        self._issuing_country = issuing_country.lower()
         self._suspension_reason: Optional[str] = None
         self._revocation_reason: Optional[str] = None
 
@@ -107,6 +108,10 @@ class Credential(ABC):
     @property
     def revocation_reason(self):
         return self._revocation_reason
+
+    @property
+    def issuing_country(self) -> str:
+        return self._issuing_country
 
     def update_status(self, status: CredentialStatus, reason: str | None) -> None:
         match status:

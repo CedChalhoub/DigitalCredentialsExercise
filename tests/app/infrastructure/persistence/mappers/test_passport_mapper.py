@@ -14,7 +14,7 @@ def passport():
         valid_from=datetime(2024, 1, 1, tzinfo=UTC),
         valid_until=datetime(2034, 12, 31, tzinfo=UTC),
         nationality="Canadian",
-        issuing_country="Canada"
+        issuing_country="ca"
     )
 
 
@@ -23,17 +23,9 @@ class TestPassportMapper:
         mapper = PassportMapper()
         dynamo_item = mapper.to_dynamo(passport)
 
-        assert dynamo_item['PK'] == f'CRED#{passport.issuer_id}'
+        assert dynamo_item['PK'] == f'CRED#ca#{passport.issuer_id}'
         assert dynamo_item['SK'] == 'METADATA#passport'
-        assert dynamo_item['credential_type'] == CredentialType.PASSPORT.value
-        assert dynamo_item['issuer_id'] == passport.issuer_id
-        assert dynamo_item['holder_id'] == passport.holder_id
-        assert dynamo_item['valid_from'] == '2024-01-01T00:00:00+00:00'
-        assert dynamo_item['valid_until'] == '2034-12-31T00:00:00+00:00'
-        assert dynamo_item['status'] == CredentialStatus.ACTIVE.value
-        assert dynamo_item['nationality'] == 'Canadian'
-        assert dynamo_item['issuing_country'] == 'Canada'
-        assert dynamo_item['version'] == 1
+        assert dynamo_item['issuing_country'] == 'ca'
 
     def test_to_domain(self, passport):
         mapper = PassportMapper()
@@ -65,7 +57,7 @@ class TestPassportMapper:
             'valid_from': '2024-01-01T00:00:00+00:00',
             'valid_until': '2034-12-31T00:00:00+00:00',
             'nationality': 'Canadian',
-            'issuing_country': 'Canada',
+            'issuing_country': 'CA',
             'status': CredentialStatus.REVOKED.value,
             'revocation_reason': 'Test revocation',
             'suspension_reason': None

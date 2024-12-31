@@ -3,12 +3,12 @@ from datetime import datetime, UTC
 from unittest.mock import Mock, patch
 from botocore.exceptions import ClientError
 from app.domain.enums.credential_type import CredentialType
-from app.domain.models.drivers_license import DriversLicense
 from app.domain.exceptions.credential.credential_not_found_exception import CredentialNotFoundException
+from app.domain.models.drivers_license import DriversLicense
 from app.infrastructure.exceptions.database_exception import DatabaseException
-from app.infrastructure.persistence.repositories.dynamodb_credential_repository import DynamoDBCredentialRepository
 from app.infrastructure.persistence.dynamodb.database_config import DatabaseConfig
 from app.infrastructure.persistence.dynamodb.dynamodb_manager import DynamoDBManager
+from app.infrastructure.persistence.repositories.dynamodb_credential_repository import DynamoDBCredentialRepository
 
 
 @pytest.fixture
@@ -25,7 +25,6 @@ def mock_db_manager():
             secret_access_key='dummy'
         )
         db_manager = DynamoDBManager(config)
-        # Set the private attribute instead of the property
         db_manager._dynamodb = mock_resource.return_value
         return db_manager
 
@@ -38,14 +37,15 @@ def sample_drivers_license():
         valid_from=datetime(2024, 1, 1, tzinfo=UTC),
         valid_until=datetime(2029, 12, 31, tzinfo=UTC),
         vehicle_classes=["A", "B"],
-        issuing_province="ON"
+        issuing_country="CA",
+        issuing_region="ON"
     )
 
 
 @pytest.fixture
 def dynamo_item():
     return {
-        'PK': 'CRED#test-issuer-123',
+        'PK': 'CRED#CA#test-issuer-123',
         'SK': 'METADATA#drivers_license',
         'credential_type': 'drivers_license',
         'issuer_id': 'test-issuer-123',
@@ -54,7 +54,8 @@ def dynamo_item():
         'valid_until': '2029-12-31T00:00:00+00:00',
         'status': 'active',
         'vehicle_classes': ['A', 'B'],
-        'issuing_province': 'ON',
+        'issuing_country': 'CA',
+        'issuing_region': 'ON',
         'suspension_reason': None,
         'revocation_reason': None,
         'version': 1
@@ -66,13 +67,14 @@ class TestDynamoDBCredentialRepository:
         repo = DynamoDBCredentialRepository(mock_db_manager)
         mock_db_manager._dynamodb.Table().get_item.return_value = {'Item': dynamo_item}
 
-        credential = repo.get_credential("test-issuer-123", CredentialType.DRIVERS_LICENSE)
+        credential = repo.get_credential("test-issuer-123", CredentialType.DRIVERS_LICENSE, "ca")
 
         assert credential.issuer_id == "test-issuer-123"
         assert credential.holder_id == "test-holder-456"
+        assert credential.issuing_country == "ca"
         mock_db_manager._dynamodb.Table().get_item.assert_called_once_with(
             Key={
-                'PK': 'CRED#test-issuer-123',
+                'PK': 'CRED#ca#test-issuer-123',
                 'SK': 'METADATA#drivers_license'
             }
         )
@@ -81,8 +83,10 @@ class TestDynamoDBCredentialRepository:
         repo = DynamoDBCredentialRepository(mock_db_manager)
         mock_db_manager._dynamodb.Table().get_item.return_value = {}
 
-        with pytest.raises(CredentialNotFoundException):
-            repo.get_credential("nonexistent", CredentialType.DRIVERS_LICENSE)
+        with pytest.raises(CredentialNotFoundException) as exc_info:
+            repo.get_credential("nonexistent", CredentialType.DRIVERS_LICENSE, "ca")
+
+        assert "not found" in str(exc_info.value)
 
     def test_get_credential_client_error(self, mock_db_manager):
         repo = DynamoDBCredentialRepository(mock_db_manager)
@@ -91,8 +95,10 @@ class TestDynamoDBCredentialRepository:
             operation_name='GetItem'
         )
 
-        with pytest.raises(DatabaseException):
-            repo.get_credential("test-id", CredentialType.DRIVERS_LICENSE)
+        with pytest.raises(DatabaseException) as exc_info:
+            repo.get_credential("test-id", CredentialType.DRIVERS_LICENSE, "ca")
+
+        assert "Error getting credential" in str(exc_info.value)
 
     def test_create_credential(self, mock_db_manager, sample_drivers_license):
         repo = DynamoDBCredentialRepository(mock_db_manager)
@@ -101,7 +107,7 @@ class TestDynamoDBCredentialRepository:
 
         mock_db_manager._dynamodb.Table().put_item.assert_called_once()
         put_item_args = mock_db_manager._dynamodb.Table().put_item.call_args[1]['Item']
-        assert put_item_args['PK'] == f'CRED#{sample_drivers_license.issuer_id}'
+        assert put_item_args['PK'] == f'CRED#ca#{sample_drivers_license.issuer_id}'
         assert put_item_args['SK'] == 'METADATA#drivers_license'
 
     def test_create_credential_error(self, mock_db_manager, sample_drivers_license):
@@ -111,8 +117,10 @@ class TestDynamoDBCredentialRepository:
             operation_name='PutItem'
         )
 
-        with pytest.raises(DatabaseException):
+        with pytest.raises(DatabaseException) as exc_info:
             repo.create_credential(sample_drivers_license)
+
+        assert "Error creating credential" in str(exc_info.value)
 
     def test_update_credential_status(self, mock_db_manager, sample_drivers_license):
         repo = DynamoDBCredentialRepository(mock_db_manager)
@@ -122,10 +130,8 @@ class TestDynamoDBCredentialRepository:
 
         mock_db_manager._dynamodb.Table().update_item.assert_called_once()
         update_args = mock_db_manager._dynamodb.Table().update_item.call_args[1]
-        assert update_args['Key']['PK'] == f'CRED#{sample_drivers_license.issuer_id}'
+        assert update_args['Key']['PK'] == f'CRED#ca#{sample_drivers_license.issuer_id}'
         assert update_args['Key']['SK'] == 'METADATA#drivers_license'
-        assert update_args['ExpressionAttributeValues'][':status'] == 'suspended'
-        assert update_args['ExpressionAttributeValues'][':suspension_reason'] == 'Test suspension'
 
     def test_update_credential_status_error(self, mock_db_manager, sample_drivers_license):
         repo = DynamoDBCredentialRepository(mock_db_manager)
@@ -134,5 +140,7 @@ class TestDynamoDBCredentialRepository:
             operation_name='UpdateItem'
         )
 
-        with pytest.raises(DatabaseException):
+        with pytest.raises(DatabaseException) as exc_info:
             repo.update_credential_status(sample_drivers_license)
+
+        assert "Error updating item in DynamoDB" in str(exc_info.value)

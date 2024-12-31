@@ -9,7 +9,7 @@ from app.application.interfaces.credential_mapper import AbstractCredentialMappe
 class PassportMapper(AbstractCredentialMapper, ABC):
     def to_dynamo(self, credential: Passport) -> dict:
         return {
-            'PK': f'CRED#{str(credential.issuer_id)}',
+            'PK': f'CRED#{credential.issuing_country}#{str(credential.issuer_id)}',
             'SK': f'METADATA#passport',
             'credential_type': CredentialType.PASSPORT.value,
             'issuer_id': str(credential.issuer_id),

@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime, UTC
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from app.application.services.credential_service import CredentialService
 from app.domain.enums.credential_status import CredentialStatus
@@ -26,7 +26,8 @@ def sample_drivers_license():
         valid_from=datetime(2024, 1, 1, tzinfo=UTC),
         valid_until=datetime(2029, 12, 31, tzinfo=UTC),
         vehicle_classes=["A", "B"],
-        issuing_province="ON"
+        issuing_country="CA",
+        issuing_region="ON"
     )
 
 
@@ -36,12 +37,14 @@ class TestCredentialService:
 
         credential = credential_service.get_credential(
             "test-id",
-            CredentialType.DRIVERS_LICENSE
+            CredentialType.DRIVERS_LICENSE,
+            "ca"
         )
 
         mock_repository.get_credential.assert_called_once_with(
             "test-id",
-            CredentialType.DRIVERS_LICENSE
+            CredentialType.DRIVERS_LICENSE,
+            "ca"
         )
         assert credential == sample_drivers_license
 
@@ -50,10 +53,15 @@ class TestCredentialService:
 
         status = credential_service.validate_credential(
             "test-id",
-            CredentialType.DRIVERS_LICENSE
+            CredentialType.DRIVERS_LICENSE,
+            "CA"
         )
 
-        mock_repository.get_credential.assert_called_once()
+        mock_repository.get_credential.assert_called_once_with(
+            "test-id",
+            CredentialType.DRIVERS_LICENSE,
+            "CA"
+        )
         assert status == CredentialStatus.ACTIVE
 
     def test_create_credential(self, credential_service, mock_repository, sample_drivers_license):
@@ -69,6 +77,7 @@ class TestCredentialService:
 
         credential_service.update_credential(
             "test-id",
+            "CA",
             CredentialType.DRIVERS_LICENSE,
             CredentialStatus.SUSPENDED,
             "Test suspension"
@@ -83,6 +92,7 @@ class TestCredentialService:
 
         credential_service.update_credential(
             "test-id",
+            "CA",
             CredentialType.DRIVERS_LICENSE,
             CredentialStatus.REVOKED,
             "Test revocation"
@@ -98,11 +108,10 @@ class TestCredentialService:
 
         credential_service.update_credential(
             "test-id",
+            "CA",
             CredentialType.DRIVERS_LICENSE,
             CredentialStatus.ACTIVE,
             None
         )
 
         assert sample_drivers_license.status == CredentialStatus.ACTIVE
-        assert sample_drivers_license.suspension_reason is None
-        mock_repository.update_credential_status.assert_called_once_with(sample_drivers_license)

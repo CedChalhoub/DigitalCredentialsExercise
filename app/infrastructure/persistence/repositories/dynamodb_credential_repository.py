@@ -19,11 +19,11 @@ class DynamoDBCredentialRepository(AbstractCredentialRepository):
         self._table = self.create_credentials_table()
         self._mapperFactory = MapperFactory()
 
-    def get_credential(self, credential_id: str, credential_type: CredentialType) -> Credential | None:
+    def get_credential(self, credential_id: str, credential_type: CredentialType, issuing_country: str) -> Credential | None:
         try:
             response = self._table.get_item(
                 Key={
-                    'PK': f'CRED#{credential_id}',
+                    'PK': f'CRED#{issuing_country}#{str(credential_id)}',
                     'SK': f'METADATA#{credential_type.value}'
                 })
 
@@ -105,7 +105,7 @@ class DynamoDBCredentialRepository(AbstractCredentialRepository):
         try:
             response = self._table.update_item(
                 Key={
-                    'PK': f'CRED#{str(credential.issuer_id)}',
+                    'PK': f'CRED#{credential.issuing_country}#{str(credential.issuer_id)}',
                     'SK': f'METADATA#{credential.get_credential_type().value}'
                 },
                 UpdateExpression=update_expression,

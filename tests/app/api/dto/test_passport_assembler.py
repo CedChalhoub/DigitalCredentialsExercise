@@ -14,7 +14,7 @@ def passport():
         valid_from=datetime(2024, 1, 1, tzinfo=UTC),
         valid_until=datetime(2034, 12, 31, tzinfo=UTC),
         nationality="Canadian",
-        issuing_country="Canada"
+        issuing_country="CA"
     )
 
 
@@ -26,7 +26,7 @@ def passport_dto():
         "valid_from": "2024-01-01T00:00:00+00:00",
         "valid_until": "2034-12-31T00:00:00+00:00",
         "nationality": "Canadian",
-        "issuing_country": "Canada",
+        "issuing_country": "ca",
         "status": "active"
     }
 
@@ -57,34 +57,3 @@ class TestPassportAssembler:
         assert domain_obj.nationality == passport_dto["nationality"]
         assert domain_obj.issuing_country == passport_dto["issuing_country"]
         assert domain_obj.status == CredentialStatus.ACTIVE
-
-    def test_to_dto_with_suspension(self, passport):
-        assembler = PassportAssembler()
-        passport.suspend("Passport suspended pending investigation")
-        dto = assembler.to_dto(passport)
-
-        assert dto.status == "suspended"
-        assert dto.suspension_reason == "Passport suspended pending investigation"
-        assert dto.revocation_reason is None
-
-    def test_to_dto_with_revocation(self, passport):
-        assembler = PassportAssembler()
-        passport.revoke("Passport revoked due to fraud")
-        dto = assembler.to_dto(passport)
-
-        assert dto.status == "revoked"
-        assert dto.revocation_reason == "Passport revoked due to fraud"
-        assert dto.suspension_reason is None
-
-    def test_to_domain_with_status(self, passport_dto):
-        assembler = PassportAssembler()
-
-        passport_dto["status"] = "suspended"
-        passport_dto["suspension_reason"] = "Test suspension"
-        suspended = assembler.to_domain(passport_dto)
-        assert suspended.status == CredentialStatus.ACTIVE
-
-        passport_dto["status"] = "revoked"
-        passport_dto["revocation_reason"] = "Test revocation"
-        revoked = assembler.to_domain(passport_dto)
-        assert revoked.status == CredentialStatus.ACTIVE

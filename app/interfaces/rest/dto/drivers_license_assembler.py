@@ -20,11 +20,12 @@ class DriversLicenseAssembler(CredentialAssembler):
             holder_id=drivers_license.holder_id,
             valid_from=drivers_license.valid_from.isoformat(),
             valid_until=drivers_license.valid_until.isoformat(),
+            issuing_country=drivers_license.issuing_country,
             status=drivers_license.status.value,
             suspension_reason=drivers_license.suspension_reason,
             revocation_reason=drivers_license.revocation_reason,
             vehicle_classes=drivers_license.vehicle_classes,
-            issuing_province=drivers_license.issuing_province
+            issuing_region=drivers_license.issuing_region
         )
 
     def to_domain(self, credential_dto: CredentialDTO) -> DriversLicense:
@@ -34,6 +35,7 @@ class DriversLicenseAssembler(CredentialAssembler):
             holder_id=license_dto.holder_id,
             valid_from=datetime.fromisoformat(license_dto.valid_from),
             valid_until=datetime.fromisoformat(license_dto.valid_until),
+            issuing_country=license_dto.issuing_country,
             vehicle_classes=license_dto.vehicle_classes,
-            issuing_province=license_dto.issuing_province
+            issuing_region=license_dto.issuing_region
         )
