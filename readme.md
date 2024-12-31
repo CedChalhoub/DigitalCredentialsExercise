@@ -52,18 +52,20 @@ The API will be available at `http://localhost:3000`
 ### GET /heartbeat
 Health check endpoint.
 
-### GET /credentials/{credential_id}
+### GET /credentials/{issuing_country}/{credential_id}
 Retrieve a credential by ID.
 
 **Parameters:**
 - `credential_id`: Credential identifier
+- `issuing_country`: Country where credential was issued
 - `credential_type`: Query parameter specifying the type (`drivers_license` or `passport`)
 
-### GET /credentials/validate/{credential_id}
+### GET /credentials/validate/{issuing_country}/{credential_id}
 Validate a credential's status.
 
 **Parameters:**
 - `credential_id`: Credential identifier
+- `issuing_country`: Country where credential was issued
 - `credential_type`: Query parameter specifying the type (`drivers_license` and `passport` currently supported, more to come)
 
 ### POST /credentials
@@ -80,7 +82,8 @@ Create a new credential.
   "valid_from": "2024-01-01T00:00:00Z",
   "valid_until": "2029-01-01T00:00:00Z",
   "vehicle_classes": ["A", "B"],
-  "issuing_province": "string"
+  "issuing_region": "string",
+  "issuing_country": "Canada"
 }
 ```
 
@@ -96,11 +99,12 @@ Create a new credential.
 }
 ```
 
-### PATCH /credentials/{credential_id}
+### PATCH /credentials/{issuing_country}/{credential_id}
 Update a credential's status.
 
 **Parameters:**
 - `credential_id`: Credential identifier
+- `issuing_country`: Country where credential was issued
 - `credential_type`: Query parameter specifying the type
 
 **Body:**
