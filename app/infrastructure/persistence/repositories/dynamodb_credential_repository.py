@@ -16,7 +16,7 @@ from app.infrastructure.persistence.mappers.mapper_factory import MapperFactory
 class DynamoDBCredentialRepository(AbstractCredentialRepository):
     def __init__(self, db_manager: DynamoDBManager):
         self.dynamodb = db_manager.client
-        self._table = self.create_credentials_table()
+        self._table = self._create_credentials_table()
         self._mapperFactory = MapperFactory()
 
     def get_credential(self, credential_id: str, credential_type: CredentialType, issuing_country: str) -> Credential | None:
@@ -42,10 +42,7 @@ class DynamoDBCredentialRepository(AbstractCredentialRepository):
             raise DatabaseException(
                 f"Error getting credential: {str(e)}")
 
-    def create_credentials_table(self):
-        """
-        Creates the Credentials table if it doesn't exist
-        """
+    def _create_credentials_table(self):
         try:
             # Create the table
             table = self.dynamodb.create_table(

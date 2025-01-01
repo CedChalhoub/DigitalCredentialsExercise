@@ -7,6 +7,7 @@ REST API for managing digital credentials (passports, driver's licenses, etc.) w
 - Issue digital credentials (passports, driver's licenses)
 - Validate credential status
 - Update credential status (suspend/revoke)
+- API key authentication
 - DDD architecture with AWS deployment support
 
 ## Prerequisites
@@ -39,7 +40,6 @@ REST API for managing digital credentials (passports, driver's licenses, etc.) w
     ```
    Note: Requires Java Runtime Environment (JRE) version 8.x or newer
 
-
 3. Run the FastAPI application:
     ```bash
     sam local start-api
@@ -47,13 +47,56 @@ REST API for managing digital credentials (passports, driver's licenses, etc.) w
 
 The API will be available at `http://localhost:3000`
 
+## Authentication
+
+The API uses API key authentication for protected endpoints. To use protected endpoints, you must first generate an API key and include it in your requests.
+
+### Generating an API Key
+
+Send a POST request to `/api-keys` to generate a new API key:
+
+```json
+{
+  "description": "Optional description for the API key"
+}
+```
+
+The response will include your API key:
+
+```json
+{
+  "key": "generated-api-key",
+  "description": "Optional description for the API key",
+  "created_at": "2024-01-01T00:00:00Z",
+  "last_used": null
+}
+```
+
+### Using API Keys
+
+For protected endpoints, include your API key in the `X-API-Key` header:
+
+```
+X-API-Key: your-api-key
+```
+
 ## API Endpoints
 
-### GET /heartbeat
-Health check endpoint.
+### GET /
+Health check endpoint. No authentication required.
+
+### POST /api-keys
+Generate a new API key. No authentication required.
+
+**Body (optional):**
+```json
+{
+  "description": "string"
+}
+```
 
 ### GET /credentials/{issuing_country}/{credential_id}
-Retrieve a credential by ID.
+Retrieve a credential by ID. No authentication required.
 
 **Parameters:**
 - `credential_id`: Credential identifier
@@ -61,7 +104,7 @@ Retrieve a credential by ID.
 - `credential_type`: Query parameter specifying the type (`drivers_license` or `passport`)
 
 ### GET /credentials/validate/{issuing_country}/{credential_id}
-Validate a credential's status.
+Validate a credential's status. No authentication required.
 
 **Parameters:**
 - `credential_id`: Credential identifier
@@ -69,7 +112,10 @@ Validate a credential's status.
 - `credential_type`: Query parameter specifying the type (`drivers_license` and `passport` currently supported, more to come)
 
 ### POST /credentials
-Create a new credential.
+Create a new credential. Requires API key authentication.
+
+**Headers:**
+- `X-API-Key`: Your API key
 
 **Parameters:**
 - `credential_type`: Query parameter specifying the type (`drivers_license` or `passport`)
@@ -100,7 +146,10 @@ Create a new credential.
 ```
 
 ### PATCH /credentials/{issuing_country}/{credential_id}
-Update a credential's status.
+Update a credential's status. Requires API key authentication.
+
+**Headers:**
+- `X-API-Key`: Your API key
 
 **Parameters:**
 - `credential_id`: Credential identifier
@@ -118,10 +167,9 @@ Update a credential's status.
 ## Testing
 
 Run unit tests:
-    ```
-    python -m pytest tests/
-    ```
-
+```bash
+python -m pytest tests/
+```
 
 ## AWS Deployment
 
