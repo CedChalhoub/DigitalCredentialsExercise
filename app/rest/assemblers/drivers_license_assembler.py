@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from app.interfaces.rest.dto.assembler_registry import AssemblerRegistry
-from app.interfaces.rest.dto.credential_assembler import CredentialAssembler
-from app.interfaces.rest.dto.credential_dto import CredentialDTO
-from app.interfaces.rest.dto.drivers_license_dto import DriversLicenseDTO
-from app.interfaces.rest.exceptions.invalid_credential_data_exception import InvalidCredentialDataException
+from app.rest.assemblers.assembler_registry import AssemblerRegistry
+from app.rest.assemblers.credential_assembler import CredentialAssembler
+from app.rest.dto.credential_dto import CredentialDTO
+from app.rest.dto.drivers_license_dto import DriversLicenseDTO
+from app.rest.exceptions.invalid_credential_data_exception import InvalidCredentialDataException
 from app.domain.models.drivers_license import DriversLicense
 
 @AssemblerRegistry.register("drivers_license")

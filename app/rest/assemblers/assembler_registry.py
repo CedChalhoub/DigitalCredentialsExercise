@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from typing import Type, Dict
 
-from app.interfaces.rest.dto.credential_assembler import CredentialAssembler
+from app.rest.assemblers.credential_assembler import CredentialAssembler
 
 
 class AssemblerRegistry:

@@ -12,7 +12,7 @@ class DriversLicense(Credential, ABC):
         self._vehicle_classes = vehicle_classes
         self._issuing_region = issuing_region
 
-    def _validate_holder_id(self, holder_id: str) -> None:
+    def _validate_issuer_id(self, holder_id: str) -> None:
         # match the validation for drivers' licenses
         pass
 

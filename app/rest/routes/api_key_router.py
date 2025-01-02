@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, Body
+from fastapi import APIRouter, Depends
 
 from app.application.services.api_auth_service import ApiAuthService
 from app.dependencies import get_api_key_service
-from app.interfaces.rest.dto.api_key_dto import ApiKeyDto
-from app.interfaces.rest.dto.generate_api_key_dto import GenerateApiKeyDto
+from app.rest.dto.api_key_dto import ApiKeyDto
+from app.rest.dto.generate_api_key_dto import GenerateApiKeyDto
 
 
 class ApiKeyRouter:

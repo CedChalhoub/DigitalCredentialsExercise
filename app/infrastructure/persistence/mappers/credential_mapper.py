@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from app.domain.models.credential import Credential
 
 
-class AbstractCredentialMapper(ABC):
+class CredentialMapper(ABC):
     @abstractmethod
     def to_dynamo(self, credential: Credential) -> dict:
         pass

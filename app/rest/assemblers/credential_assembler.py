@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from app.domain.models.credential import Credential
-from app.interfaces.rest.dto.credential_dto import CredentialDTO
+from app.rest.dto.credential_dto import CredentialDTO
 
 
 class CredentialAssembler(ABC):

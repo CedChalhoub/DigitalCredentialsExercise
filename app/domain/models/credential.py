@@ -10,7 +10,6 @@ from app.domain.exceptions.credential.invalid_credential_state_exception import 
 
 
 class Credential(ABC):
-
     def __init__(self, issuer_id: str, holder_id: str, valid_from: datetime, valid_until: datetime, issuing_country: str):
         self._issuer_id = issuer_id
         self._holder_id = holder_id
@@ -20,19 +19,21 @@ class Credential(ABC):
         if valid_until.tzinfo is None:
             raise ValueError("valid_until must be timezone-aware")
 
-        if valid_until < valid_from:
-            raise InvalidCredentialStateException("valid_until must be after valid_from")
-
         self._valid_from = valid_from.astimezone(timezone.utc)
         self._valid_until = valid_until.astimezone(timezone.utc)
+
+        if self._valid_until < self._valid_from:
+            raise InvalidCredentialStateException("valid_until must be after valid_from")
+
         self._status = CredentialStatus.ACTIVE
         self._issuing_country = issuing_country.lower()
         self._suspension_reason: Optional[str] = None
         self._revocation_reason: Optional[str] = None
 
+
     @abstractmethod
-    def _validate_holder_id(self, holder_id: str) -> None:
-        """Validate the holder_id"""
+    def _validate_issuer_id(self, issuer: str) -> None:
+        # Not implemented, but needs to validate the format of the credential id
         pass
 
     @abstractmethod

@@ -1,4 +1,4 @@
-from app.interfaces.rest.dto.credential_dto import CredentialDTO
+from app.rest.dto.credential_dto import CredentialDTO
 
 
 class PassportDTO(CredentialDTO):

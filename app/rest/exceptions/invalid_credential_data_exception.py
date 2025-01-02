@@ -1,4 +1,4 @@
-from app.interfaces.rest.exceptions.assembler_exception import AssemblerException
+from app.rest.exceptions.assembler_exception import AssemblerException
 
 
 class InvalidCredentialDataException(AssemblerException):

@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime, UTC
+
 from app.domain.enums.credential_status import CredentialStatus
-from app.domain.enums.credential_type import CredentialType
 from app.domain.models.passport import Passport
 from app.infrastructure.persistence.mappers.passport_mapper import PassportMapper
 
@@ -19,7 +19,8 @@ def passport():
 
 
 class TestPassportMapper:
-    def test_to_dynamo(self, passport):
+    def test_given_passport_when_converting_to_dynamo_then_returns_correct_format(
+            self, passport):
         mapper = PassportMapper()
         dynamo_item = mapper.to_dynamo(passport)
 
@@ -27,7 +28,8 @@ class TestPassportMapper:
         assert dynamo_item['SK'] == 'METADATA#passport'
         assert dynamo_item['issuing_country'] == 'ca'
 
-    def test_to_domain(self, passport):
+    def test_given_dynamo_item_when_converting_to_domain_then_returns_correct_passport(
+            self, passport):
         mapper = PassportMapper()
         dynamo_item = mapper.to_dynamo(passport)
 
@@ -41,7 +43,8 @@ class TestPassportMapper:
         assert reconstructed.nationality == passport.nationality
         assert reconstructed.issuing_country == passport.issuing_country
 
-    def test_to_dynamo_with_revocation(self, passport):
+    def test_given_revoked_passport_when_converting_to_dynamo_then_includes_revocation_status(
+            self, passport):
         mapper = PassportMapper()
         passport.revoke("Test revocation")
         dynamo_item = mapper.to_dynamo(passport)
@@ -49,7 +52,8 @@ class TestPassportMapper:
         assert dynamo_item['status'] == CredentialStatus.REVOKED.value
         assert dynamo_item['revocation_reason'] == "Test revocation"
 
-    def test_to_domain_with_revocation(self, passport):
+    def test_given_revoked_dynamo_item_when_converting_to_domain_then_includes_revocation_details(
+            self, passport):
         mapper = PassportMapper()
         dynamo_item = {
             'issuer_id': 'test-issuer-789',

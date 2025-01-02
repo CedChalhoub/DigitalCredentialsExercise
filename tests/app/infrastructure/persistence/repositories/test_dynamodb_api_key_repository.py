@@ -37,7 +37,8 @@ def sample_api_key():
 
 
 class TestDynamoDBApiKeyRepository:
-    def test_store_api_key_success(self, mock_db_manager, sample_api_key):
+    def test_given_valid_api_key_when_storing_then_stores_successfully(
+            self, mock_db_manager, sample_api_key):
         repo = DynamoDBApiKeyRepository(mock_db_manager)
 
         repo.store_api_key(sample_api_key)
@@ -47,7 +48,8 @@ class TestDynamoDBApiKeyRepository:
         assert put_item_args['PK'] == f'APIKEY#{sample_api_key.key}'
         assert put_item_args['SK'] == 'METADATA'
 
-    def test_store_api_key_error(self, mock_db_manager, sample_api_key):
+    def test_given_database_error_when_storing_api_key_then_raises_exception(
+            self, mock_db_manager, sample_api_key):
         repo = DynamoDBApiKeyRepository(mock_db_manager)
         mock_db_manager._dynamodb.Table().put_item.side_effect = ClientError(
             error_response={'Error': {'Message': 'Test error'}},
@@ -59,7 +61,8 @@ class TestDynamoDBApiKeyRepository:
 
         assert "Error storing API key" in str(exc_info.value)
 
-    def test_get_api_key_success(self, mock_db_manager, sample_api_key):
+    def test_given_existing_api_key_when_retrieving_then_returns_api_key(
+            self, mock_db_manager, sample_api_key):
         repo = DynamoDBApiKeyRepository(mock_db_manager)
         mock_db_manager._dynamodb.Table().get_item.return_value = {
             'Item': {
@@ -77,7 +80,8 @@ class TestDynamoDBApiKeyRepository:
             Key={'PK': f'APIKEY#{sample_api_key.key}', 'SK': 'METADATA'}
         )
 
-    def test_get_api_key_not_found(self, mock_db_manager):
+    def test_given_nonexistent_api_key_when_retrieving_then_returns_none(
+            self, mock_db_manager):
         repo = DynamoDBApiKeyRepository(mock_db_manager)
         mock_db_manager._dynamodb.Table().get_item.return_value = {}
 
@@ -85,7 +89,8 @@ class TestDynamoDBApiKeyRepository:
 
         assert result is None
 
-    def test_update_api_key_success(self, mock_db_manager):
+    def test_given_valid_api_key_when_updating_then_updates_last_used_timestamp(
+            self, mock_db_manager):
         repo = DynamoDBApiKeyRepository(mock_db_manager)
         timestamp = datetime.now(UTC)
 
@@ -96,7 +101,8 @@ class TestDynamoDBApiKeyRepository:
         assert update_args['Key']['PK'] == 'APIKEY#test-key'
         assert update_args['ExpressionAttributeValues'][':timestamp'] == timestamp.isoformat()
 
-    def test_update_api_key_error(self, mock_db_manager):
+    def test_given_database_error_when_updating_api_key_then_raises_exception(
+            self, mock_db_manager):
         repo = DynamoDBApiKeyRepository(mock_db_manager)
         mock_db_manager._dynamodb.Table().update_item.side_effect = ClientError(
             error_response={'Error': {'Message': 'Test error'}},

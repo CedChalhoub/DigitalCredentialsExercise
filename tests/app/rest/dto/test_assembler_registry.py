@@ -1,14 +1,14 @@
 import pytest
+from datetime import datetime, UTC
 from fastapi import HTTPException
-from app.interfaces.rest.dto.assembler_registry import AssemblerRegistry
-from app.interfaces.rest.dto.credential_assembler import CredentialAssembler
+from app.rest.assemblers.assembler_registry import AssemblerRegistry
+from app.rest.assemblers.credential_assembler import CredentialAssembler
 from app.domain.models.credential import Credential
-from app.interfaces.rest.dto.credential_dto import CredentialDTO
+from app.rest.dto.credential_dto import CredentialDTO
 
 
-# Test fixtures
 class MockCredential(Credential):
-    def _validate_holder_id(self, holder_id: str) -> None:
+    def _validate_issuer_id(self, holder_id: str) -> None:
         pass
 
     def get_credential_type(self):
@@ -25,19 +25,21 @@ class MockAssembler(CredentialAssembler):
             issuer_id="test_issuer",
             holder_id="test_holder",
             valid_from="2024-01-01T00:00:00Z",
-            valid_until="2024-12-31T23:59:59Z"
+            valid_until="2024-12-31T23:59:59Z",
+            issuing_country="CA"
         )
 
     def to_domain(self, credential_dto: dict) -> Credential:
         return MockCredential(
             issuer_id="test_issuer",
             holder_id="test_holder",
-            valid_from="2024-01-01T00:00:00Z",
-            valid_until="2024-12-31T23:59:59Z"
+            valid_from=datetime(2024, 1, 1, tzinfo=UTC),
+            valid_until=datetime(2024, 12, 31, tzinfo=UTC),
+            issuing_country="CA"
         )
 
 
-def test_register_assembler():
+def test_given_assembler_class_when_registering_then_adds_to_registry():
     registry = AssemblerRegistry()
 
     @registry.register("test_credential")
@@ -48,7 +50,7 @@ def test_register_assembler():
     assert registry._assemblers["test_credential"] == TestAssembler
 
 
-def test_get_assembler_success():
+def test_given_registered_credential_type_when_getting_assembler_then_returns_correct_assembler():
     registry = AssemblerRegistry()
 
     @registry.register("test_credential")
@@ -59,7 +61,7 @@ def test_get_assembler_success():
     assert isinstance(assembler, TestAssembler)
 
 
-def test_get_assembler_not_found():
+def test_given_unregistered_credential_type_when_getting_assembler_then_raises_exception():
     registry = AssemblerRegistry()
 
     with pytest.raises(HTTPException) as exc_info:
@@ -69,7 +71,7 @@ def test_get_assembler_not_found():
     assert "Unsupported credential type" in exc_info.value.detail
 
 
-def test_multiple_assemblers():
+def test_given_multiple_assemblers_when_registering_then_all_are_accessible():
     registry = AssemblerRegistry()
 
     @registry.register("credential_1")
@@ -86,7 +88,7 @@ def test_multiple_assemblers():
     assert isinstance(registry.get_assembler("credential_2"), TestAssembler2)
 
 
-def test_register_same_type_overwrites():
+def test_given_existing_credential_type_when_registering_new_assembler_then_overwrites_previous():
     registry = AssemblerRegistry()
 
     @registry.register("test_credential")

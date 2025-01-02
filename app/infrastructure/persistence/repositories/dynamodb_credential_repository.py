@@ -2,7 +2,7 @@ from datetime import datetime, UTC
 
 from botocore.exceptions import ClientError
 
-from app.application.interfaces.credential_mapper import AbstractCredentialMapper
+from app.infrastructure.persistence.mappers.credential_mapper import CredentialMapper
 
 from app.domain.models.credential import Credential
 from app.domain.repositories.credential_repository import AbstractCredentialRepository
@@ -10,14 +10,14 @@ from app.domain.enums.credential_type import CredentialType
 from app.domain.exceptions.credential.credential_not_found_exception import CredentialNotFoundException
 from app.infrastructure.persistence.dynamodb.dynamodb_manager import DynamoDBManager
 from app.infrastructure.exceptions.database_exception import DatabaseException
-from app.infrastructure.persistence.mappers.mapper_factory import MapperFactory
+from app.infrastructure.persistence.mappers.credential_mapper_provider import CredentialMapperProvider
 
 
 class DynamoDBCredentialRepository(AbstractCredentialRepository):
     def __init__(self, db_manager: DynamoDBManager):
         self.dynamodb = db_manager.client
         self._table = self._create_credentials_table()
-        self._mapperFactory = MapperFactory()
+        self._mapperFactory = CredentialMapperProvider()
 
     def get_credential(self, credential_id: str, credential_type: CredentialType, issuing_country: str) -> Credential | None:
         try:
@@ -84,7 +84,7 @@ class DynamoDBCredentialRepository(AbstractCredentialRepository):
             raise DatabaseException(f"Error creating table: {str(e)}")
     def create_credential(self, credential: Credential):
         try:
-            credential_mapper: AbstractCredentialMapper = self._mapperFactory.get_mapper(credential.get_credential_type())
+            credential_mapper: CredentialMapper = self._mapperFactory.get_mapper(credential.get_credential_type())
             credential_item = credential_mapper.to_dynamo(credential)
             response = self._table.put_item(Item=credential_item)
             return response

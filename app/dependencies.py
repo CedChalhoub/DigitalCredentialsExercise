@@ -1,4 +1,3 @@
-# app/dependencies.py
 from fastapi import Depends
 from typing import Annotated
 
@@ -10,8 +9,8 @@ from app.infrastructure.persistence.repositories.dynamodb_credential_repository 
 from app.infrastructure.persistence.repositories.dynamodb_api_key_repository import DynamoDBApiKeyRepository
 from app.application.services.credential_service import CredentialService
 from app.application.services.api_auth_service import ApiAuthService
-from app.interfaces.rest.dto.assembler_registry import AssemblerRegistry
-from app.interfaces.rest.exceptions.api_auth_middleware import verify_api_key
+from app.rest.assemblers.assembler_registry import AssemblerRegistry
+from app.rest.exceptions.api_auth_middleware import verify_api_key
 
 
 def get_db_config() -> DatabaseConfig:

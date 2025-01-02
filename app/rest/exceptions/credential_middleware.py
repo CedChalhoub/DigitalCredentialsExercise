@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from app.interfaces.rest.exceptions.handlers import ExceptionHandlerRegistry
+from app.rest.exceptions.handlers import ExceptionHandlerRegistry
 
 
 def setup_exception_handlers(app: FastAPI):

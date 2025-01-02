@@ -31,7 +31,7 @@ def mock_repository(mock_db_manager):
     return DynamoDBCredentialRepository(mock_db_manager)
 
 
-def test_get_credential_service(mock_repository):
+def test_when_getting_credential_service_then_return_repository_and_service(mock_repository):
     service = get_credential_service(mock_repository)
     assert isinstance(service, CredentialService)
     assert isinstance(service._repository, DynamoDBCredentialRepository)

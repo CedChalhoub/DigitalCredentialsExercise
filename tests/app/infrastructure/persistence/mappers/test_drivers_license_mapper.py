@@ -1,7 +1,6 @@
 import pytest
 from datetime import datetime, UTC
 from app.domain.enums.credential_status import CredentialStatus
-from app.domain.enums.credential_type import CredentialType
 from app.domain.models.drivers_license import DriversLicense
 from app.infrastructure.persistence.mappers.drivers_license_mapper import DriversLicenseMapper
 
@@ -20,16 +19,18 @@ def drivers_license():
 
 
 class TestDriversLicenseMapper:
-    def test_to_dynamo(self, drivers_license):
+    def test_given_drivers_license_when_converting_to_dynamo_then_returns_correct_format(
+            self, drivers_license):
         mapper = DriversLicenseMapper()
         dynamo_item = mapper.to_dynamo(drivers_license)
 
         assert dynamo_item['PK'] == f'CRED#ca#{drivers_license.issuer_id}'
-        assert dynamo_item['SK'] == 'METADATA#drivers_license'
+        assert dynamo_item['SK'] == f'METADATA#drivers_license'
         assert dynamo_item['issuing_country'] == 'ca'
         assert dynamo_item['issuing_region'] == 'on'
 
-    def test_to_domain(self, drivers_license):
+    def test_given_dynamo_item_when_converting_to_domain_then_returns_correct_drivers_license(
+            self, drivers_license):
         mapper = DriversLicenseMapper()
         dynamo_item = mapper.to_dynamo(drivers_license)
 
@@ -44,7 +45,8 @@ class TestDriversLicenseMapper:
         assert reconstructed.issuing_country == drivers_license.issuing_country
         assert reconstructed.issuing_region == drivers_license.issuing_region
 
-    def test_to_dynamo_with_suspension(self, drivers_license):
+    def test_given_suspended_license_when_converting_to_dynamo_then_includes_suspension_status(
+            self, drivers_license):
         mapper = DriversLicenseMapper()
         drivers_license.suspend("Test suspension")
         dynamo_item = mapper.to_dynamo(drivers_license)
@@ -52,7 +54,8 @@ class TestDriversLicenseMapper:
         assert dynamo_item['status'] == CredentialStatus.SUSPENDED.value
         assert dynamo_item['suspension_reason'] == "Test suspension"
 
-    def test_to_domain_with_suspension(self, drivers_license):
+    def test_given_suspended_dynamo_item_when_converting_to_domain_then_includes_suspension_details(
+            self, drivers_license):
         mapper = DriversLicenseMapper()
         dynamo_item = {
             'issuer_id': 'test-issuer-123',

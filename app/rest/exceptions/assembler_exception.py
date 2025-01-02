@@ -1,4 +1,4 @@
-from app.interfaces.rest.exceptions.api_exception import APIException
+from app.rest.exceptions.api_exception import APIException
 
 
 class AssemblerException(APIException):

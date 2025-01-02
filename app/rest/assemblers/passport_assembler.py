@@ -1,11 +1,10 @@
 from datetime import datetime
 
-from app.interfaces.rest.dto.assembler_registry import AssemblerRegistry
-from app.interfaces.rest.dto.credential_assembler import CredentialAssembler
-from app.interfaces.rest.dto.credential_dto import CredentialDTO
-from app.interfaces.rest.exceptions.invalid_credential_data_exception import InvalidCredentialDataException
+from app.rest.assemblers.assembler_registry import AssemblerRegistry
+from app.rest.assemblers.credential_assembler import CredentialAssembler
+from app.rest.exceptions.invalid_credential_data_exception import InvalidCredentialDataException
 from app.domain.models.passport import Passport
-from app.interfaces.rest.dto.passport_dto import PassportDTO
+from app.rest.dto.passport_dto import PassportDTO
 
 @AssemblerRegistry.register("passport")
 class PassportAssembler(CredentialAssembler):
@@ -31,7 +30,7 @@ class PassportAssembler(CredentialAssembler):
         except Exception as e:
             raise InvalidCredentialDataException("conversion", f"Failed to write the passport: {str(e)}"
                                                  )
-    def to_domain(self, credential_dto: CredentialDTO) -> Passport:
+    def to_domain(self, credential_dto: dict) -> Passport:
         passport_dto = self._to_specific_dto(credential_dto)
         return Passport(
             holder_id=passport_dto.holder_id,

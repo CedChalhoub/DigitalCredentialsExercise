@@ -63,7 +63,8 @@ def dynamo_item():
 
 
 class TestDynamoDBCredentialRepository:
-    def test_get_credential_success(self, mock_db_manager, dynamo_item):
+    def test_given_existing_credential_when_retrieving_then_returns_credential(
+            self, mock_db_manager, dynamo_item):
         repo = DynamoDBCredentialRepository(mock_db_manager)
         mock_db_manager._dynamodb.Table().get_item.return_value = {'Item': dynamo_item}
 
@@ -79,7 +80,8 @@ class TestDynamoDBCredentialRepository:
             }
         )
 
-    def test_get_credential_not_found(self, mock_db_manager):
+    def test_given_nonexistent_credential_when_retrieving_then_raises_not_found_exception(
+            self, mock_db_manager):
         repo = DynamoDBCredentialRepository(mock_db_manager)
         mock_db_manager._dynamodb.Table().get_item.return_value = {}
 
@@ -88,7 +90,8 @@ class TestDynamoDBCredentialRepository:
 
         assert "not found" in str(exc_info.value)
 
-    def test_get_credential_client_error(self, mock_db_manager):
+    def test_given_database_error_when_retrieving_credential_then_raises_database_exception(
+            self, mock_db_manager):
         repo = DynamoDBCredentialRepository(mock_db_manager)
         mock_db_manager._dynamodb.Table().get_item.side_effect = ClientError(
             error_response={'Error': {'Message': 'Test error'}},
@@ -100,7 +103,8 @@ class TestDynamoDBCredentialRepository:
 
         assert "Error getting credential" in str(exc_info.value)
 
-    def test_create_credential(self, mock_db_manager, sample_drivers_license):
+    def test_given_valid_credential_when_creating_then_stores_in_dynamodb(
+            self, mock_db_manager, sample_drivers_license):
         repo = DynamoDBCredentialRepository(mock_db_manager)
 
         repo.create_credential(sample_drivers_license)
@@ -110,7 +114,8 @@ class TestDynamoDBCredentialRepository:
         assert put_item_args['PK'] == f'CRED#ca#{sample_drivers_license.issuer_id}'
         assert put_item_args['SK'] == 'METADATA#drivers_license'
 
-    def test_create_credential_error(self, mock_db_manager, sample_drivers_license):
+    def test_given_database_error_when_creating_credential_then_raises_database_exception(
+            self, mock_db_manager, sample_drivers_license):
         repo = DynamoDBCredentialRepository(mock_db_manager)
         mock_db_manager._dynamodb.Table().put_item.side_effect = ClientError(
             error_response={'Error': {'Message': 'Test error'}},
@@ -122,7 +127,8 @@ class TestDynamoDBCredentialRepository:
 
         assert "Error creating credential" in str(exc_info.value)
 
-    def test_update_credential_status(self, mock_db_manager, sample_drivers_license):
+    def test_given_valid_credential_when_updating_status_then_updates_in_dynamodb(
+            self, mock_db_manager, sample_drivers_license):
         repo = DynamoDBCredentialRepository(mock_db_manager)
         sample_drivers_license.suspend("Test suspension")
 
@@ -133,7 +139,8 @@ class TestDynamoDBCredentialRepository:
         assert update_args['Key']['PK'] == f'CRED#ca#{sample_drivers_license.issuer_id}'
         assert update_args['Key']['SK'] == 'METADATA#drivers_license'
 
-    def test_update_credential_status_error(self, mock_db_manager, sample_drivers_license):
+    def test_given_database_error_when_updating_status_then_raises_database_exception(
+            self, mock_db_manager, sample_drivers_license):
         repo = DynamoDBCredentialRepository(mock_db_manager)
         mock_db_manager._dynamodb.Table().update_item.side_effect = ClientError(
             error_response={'Error': {'Message': 'Test error'}},

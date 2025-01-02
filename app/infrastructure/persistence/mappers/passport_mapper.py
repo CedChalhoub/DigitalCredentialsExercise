@@ -1,12 +1,12 @@
-from abc import ABC
 from datetime import datetime, UTC
 
 from app.domain.enums.credential_status import CredentialStatus
 from app.domain.enums.credential_type import CredentialType
 from app.domain.models.passport import Passport
-from app.application.interfaces.credential_mapper import AbstractCredentialMapper
+from app.infrastructure.persistence.mappers.credential_mapper import CredentialMapper
 
-class PassportMapper(AbstractCredentialMapper, ABC):
+
+class PassportMapper(CredentialMapper):
     def to_dynamo(self, credential: Passport) -> dict:
         return {
             'PK': f'CRED#{credential.issuing_country}#{str(credential.issuer_id)}',

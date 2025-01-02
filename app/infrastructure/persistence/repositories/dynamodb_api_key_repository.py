@@ -1,4 +1,3 @@
-# app/infrastructure/persistence/repositories/dynamodb_api_key_repository.py
 from datetime import datetime
 from botocore.exceptions import ClientError
 from app.domain.models.api_key import ApiKey

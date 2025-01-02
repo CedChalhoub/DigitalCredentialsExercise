@@ -6,7 +6,7 @@ from app.domain.enums.credential_type import CredentialType
 
 
 class ConcreteTestCredential(Credential):
-    def _validate_holder_id(self, holder_id: str) -> None:
+    def _validate_issuer_id(self, holder_id: str) -> None:
         pass
 
     def get_credential_type(self) -> CredentialType:
@@ -34,7 +34,8 @@ def credential(valid_dates):
 
 
 class TestCredentialBase:
-    def test_create_credential(self, credential, valid_dates):
+    def test_given_valid_credential_data_when_creating_credential_then_creates_with_correct_values(
+            self, credential, valid_dates):
         assert credential.issuer_id == "test-issuer"
         assert credential.holder_id == "test-holder"
         assert credential.valid_from == valid_dates['valid_from']
@@ -42,7 +43,7 @@ class TestCredentialBase:
         assert credential.issuing_country == "ca"  # Should be lowercase
         assert credential.status == CredentialStatus.ACTIVE
 
-    def test_timezone_aware_dates(self):
+    def test_given_naive_datetime_when_creating_credential_then_raises_value_error(self):
         with pytest.raises(ValueError, match="valid_from must be timezone-aware"):
             ConcreteTestCredential(
                 issuer_id="test",
@@ -61,19 +62,22 @@ class TestCredentialBase:
                 issuing_country="CA"
             )
 
-    def test_suspend_credential(self, credential):
+    def test_given_active_credential_when_suspending_then_updates_to_suspended_status(
+            self, credential):
         credential.suspend("Test suspension")
         assert credential.status == CredentialStatus.SUSPENDED
         assert credential.suspension_reason == "Test suspension"
         assert credential.revocation_reason is None
 
-    def test_revoke_credential(self, credential):
+    def test_given_active_credential_when_revoking_then_updates_to_revoked_status(
+            self, credential):
         credential.revoke("Test revocation")
         assert credential.status == CredentialStatus.REVOKED
         assert credential.revocation_reason == "Test revocation"
         assert credential.suspension_reason is None
 
-    def test_reinstate_credential(self, credential):
+    def test_given_suspended_credential_when_reinstating_then_updates_to_active_status(
+            self, credential):
         credential.suspend("Test suspension")
         credential.reinstate()
         assert credential.status == CredentialStatus.ACTIVE

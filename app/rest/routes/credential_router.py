@@ -1,9 +1,8 @@
-# app/interfaces/rest/routers/credential_router.py
 from fastapi import APIRouter, Depends, Query, Body, Security
 from fastapi.responses import JSONResponse
 
-from app.interfaces.rest.dto.assembler_registry import AssemblerRegistry
-from app.interfaces.rest.dto.status_update_dto import StatusUpdateDTO
+from app.rest.assemblers.assembler_registry import AssemblerRegistry
+from app.rest.dto.status_update_dto import StatusUpdateDTO
 from app.application.services.credential_service import CredentialService
 from app.dependencies import get_credential_service, get_api_key_verifier
 from app.domain.models.credential import Credential

@@ -1,12 +1,12 @@
-from abc import ABC
 from datetime import datetime, UTC
 
 from app.domain.enums.credential_status import CredentialStatus
 from app.domain.enums.credential_type import CredentialType
 from app.domain.models.drivers_license import DriversLicense
-from app.application.interfaces.credential_mapper import AbstractCredentialMapper
+from app.infrastructure.persistence.mappers.credential_mapper import CredentialMapper
 
-class DriversLicenseMapper(AbstractCredentialMapper, ABC):
+
+class DriversLicenseMapper(CredentialMapper):
     def to_dynamo(self, credential: DriversLicense) -> dict:
         return {
             'PK': f'CRED#{credential.issuing_country}#{str(credential.issuer_id)}',

@@ -1,9 +1,9 @@
 from fastapi import status
 from typing import Callable, Dict
 
-from app.interfaces.rest.exceptions.api_exception import APIException
-from app.interfaces.rest.exceptions.assembler_exception import AssemblerException
-from app.interfaces.rest.exceptions.invalid_credential_data_exception import InvalidCredentialDataException
+from app.rest.exceptions.api_exception import APIException
+from app.rest.exceptions.assembler_exception import AssemblerException
+from app.rest.exceptions.invalid_credential_data_exception import InvalidCredentialDataException
 from app.application.exceptions.validation_exceptions import CredentialValidationException
 from app.domain.exceptions.credential.credential_not_found_exception import CredentialNotFoundException
 from app.domain.exceptions.credential.expired_credential_exception import ExpiredCredentialException

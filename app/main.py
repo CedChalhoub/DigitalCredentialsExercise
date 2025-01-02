@@ -1,12 +1,12 @@
 from mangum import Mangum
 from fastapi import FastAPI
 
-from app.interfaces.rest.dto.assembler_registry import AssemblerRegistry
-from app.interfaces.rest.dto.drivers_license_assembler import DriversLicenseAssembler
-from app.interfaces.rest.dto.passport_assembler import PassportAssembler
-from app.interfaces.rest.exceptions.credential_middleware import setup_exception_handlers
-from app.interfaces.rest.routes.api_key_router import ApiKeyRouter
-from app.interfaces.rest.routes.credential_router import CredentialRouter
+from app.rest.assemblers.assembler_registry import AssemblerRegistry
+from app.rest.assemblers.drivers_license_assembler import DriversLicenseAssembler
+from app.rest.assemblers.passport_assembler import PassportAssembler
+from app.rest.exceptions.credential_middleware import setup_exception_handlers
+from app.rest.routes.api_key_router import ApiKeyRouter
+from app.rest.routes.credential_router import CredentialRouter
 
 
 
