@@ -22,10 +22,11 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /{proxy+}
-            Method: ANY
+            Path: /credentials/{proxy+}  # Add the correct path
+            Method: ANY  # This will allow any method (GET, POST, etc.)
+            RestApiId: !Ref ApiGatewayApi  # Link the function to the API Gateway
             Auth:
-              AuthorizationType: 'NONE'  # Ensure no authorization is required for this API
+              AuthorizationType: 'NONE'  # No authentication required  # Ensure no authorization is required for this API
 
   CredentialStatusTable:
     Type: AWS::DynamoDB::Table
