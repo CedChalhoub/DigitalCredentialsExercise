@@ -1,9 +1,12 @@
+AWSTemplateFormatVersion: '2010-09-01'
+Transform: AWS::Serverless-2016-10-31
+
 Resources:
   CredentialApi:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./
-      Handler: app/main.handler
+      Handler: app.main.handler
       Runtime: python3.11
       Timeout: 15
       MemorySize: 256
@@ -22,51 +25,41 @@ Resources:
           Properties:
             Path: /{proxy+}
             Method: ANY
-            RestApiId: !Ref ApiGatewayApi
             Auth:
+              ApiKeyRequired: false
               AuthorizationType: 'NONE'
 
   CredentialStatusTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: "Credentials"  # Set the table name to "Credentials"
-      BillingMode: PROVISIONED  # Use provisioned throughput as per the script
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
+      TableName: !Sub ${AWS::StackName}-credential-status
+      BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: "PK"  # Partition key
-          AttributeType: "S"  # String
-        - AttributeName: "SK"  # Sort key
-          AttributeType: "S"  # String
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
       KeySchema:
-        - AttributeName: "PK"  # Partition key
-          KeyType: "HASH"
-        - AttributeName: "SK"  # Sort key
-          KeyType: "RANGE"
-      StreamSpecification:
-        StreamViewType: NEW_AND_OLD_IMAGES
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
 
   ApiKeysTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: "ApiKeys"  # Set the table name to "ApiKeys"
-      BillingMode: PROVISIONED  # Use provisioned throughput as per the script
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
+      TableName: !Sub ${AWS::StackName}-api-keys
+      BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: "PK"  # Partition key
-          AttributeType: "S"  # String
-        - AttributeName: "SK"  # Sort key
-          AttributeType: "S"  # String
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
       KeySchema:
-        - AttributeName: "PK"  # Partition key
-          KeyType: "HASH"
-        - AttributeName: "SK"  # Sort key
-          KeyType: "RANGE"
-      StreamSpecification:
-        StreamViewType: NEW_AND_OLD_IMAGES
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
 
   ApiGatewayApi:
     Type: AWS::Serverless::Api
@@ -80,12 +73,12 @@ Resources:
 Outputs:
   ApiEndpoint:
     Description: "API Gateway endpoint URL"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/credentials"
+    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/prod/credentials"
 
-  TableName:
-    Description: "DynamoDB table name"
+  CredentialTableName:
+    Description: "Credential DynamoDB table name"
     Value: !Ref CredentialStatusTable
 
   ApiKeysTableName:
-    Description: "ApiKeys DynamoDB table name"
+    Description: "Api Keys DynamoDB table name"
     Value: !Ref ApiKeysTable
