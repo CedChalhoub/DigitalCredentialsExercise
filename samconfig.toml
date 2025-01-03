@@ -11,6 +11,9 @@ environment_variables=[
   "AWS_SAM_LOCAL=true"
 ]
 [default.deploy]
+stack_name = "SAMCredentialApiStack"
+confirm_changeset = false
+fail_on_empty_changeset = false
 environment_variables=[
   "AWS_SAM_LOCAL=false",
   "AWS_DEFAULT_REGION=us-east-1"
