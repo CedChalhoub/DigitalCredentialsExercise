@@ -22,7 +22,6 @@ Resources:
             Path: /{proxy+}
             Method: ANY
             Auth:
-              ApiKeyRequired: false
               AuthorizationType: 'NONE'
 
   CredentialStatusTable:
