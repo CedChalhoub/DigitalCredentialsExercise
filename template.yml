@@ -5,12 +5,59 @@ Resources:
   CredentialApi:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./app
-      Handler: main.handler
+      CodeUri: ./
+      Handler: app/main.handler
       Runtime: python3.11
+      Timeout: 15
+      MemorySize: 256
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref CredentialStatusTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CredentialStatusTable
       Events:
         ApiEvent:
           Type: Api
           Properties:
             Path: /{proxy+}
             Method: ANY
+            Auth:
+              ApiKeyRequired: false
+              AuthorizationType: 'NONE'
+
+  CredentialStatusTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${AWS::StackName}-credential-status
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: credential_id
+          AttributeType: S
+        - AttributeName: status_date
+          AttributeType: S
+      KeySchema:
+        - AttributeName: credential_id
+          KeyType: HASH
+        - AttributeName: status_date
+          KeyType: RANGE
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET,POST, PATCH'"
+        AllowHeaders: "'Content-Type'"
+        AllowOrigin: "'*'"
+
+Outputs:
+  ApiEndpoint:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/credentials"
+
+  TableName:
+    Description: "DynamoDB table name"
+    Value: !Ref CredentialStatusTable
