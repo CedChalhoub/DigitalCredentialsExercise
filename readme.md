@@ -124,7 +124,6 @@ Create a new credential. Requires API key authentication.
 ```json
 {
   "credential_id": "string",
-  "holder_id": "string",
   "valid_from": "2024-01-01T00:00:00Z",
   "valid_until": "2029-01-01T00:00:00Z",
   "vehicle_classes": ["A", "B"],
@@ -137,7 +136,6 @@ Create a new credential. Requires API key authentication.
 ```json
 {
   "credential_id": "string",
-  "holder_id": "string",
   "valid_from": "2024-01-01T00:00:00Z",
   "valid_until": "2034-01-01T00:00:00Z",
   "nationality": "string",
