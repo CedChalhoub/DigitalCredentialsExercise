@@ -10,9 +10,8 @@ from app.domain.exceptions.credential.invalid_credential_state_exception import 
 
 
 class Credential(ABC):
-    def __init__(self, issuer_id: str, holder_id: str, valid_from: datetime, valid_until: datetime, issuing_country: str):
-        self._issuer_id = issuer_id
-        self._holder_id = holder_id
+    def __init__(self, credential_id: str, valid_from: datetime, valid_until: datetime, issuing_country: str):
+        self._credential_id = credential_id
 
         if valid_from.tzinfo is None:
             raise ValueError("valid_from must be timezone-aware")
@@ -32,7 +31,7 @@ class Credential(ABC):
 
 
     @abstractmethod
-    def _validate_issuer_id(self, issuer: str) -> None:
+    def _validate_credential_id_format(self, issuer: str) -> None:
         # Not implemented, but needs to validate the format of the credential id
         pass
 
@@ -41,12 +40,8 @@ class Credential(ABC):
         pass
 
     @property
-    def issuer_id(self) -> str:
-        return self._issuer_id
-
-    @property
-    def holder_id(self) -> str:
-        return self._holder_id
+    def credential_id(self) -> str:
+        return self._credential_id
 
     @property
     def status(self) -> CredentialStatus:

@@ -9,8 +9,7 @@ from app.infrastructure.persistence.mappers.passport_mapper import PassportMappe
 @pytest.fixture
 def passport():
     return Passport(
-        issuer_id="test-issuer-789",
-        holder_id="test-holder-012",
+        credential_id="test-issuer-789",
         valid_from=datetime(2024, 1, 1, tzinfo=UTC),
         valid_until=datetime(2034, 12, 31, tzinfo=UTC),
         nationality="Canadian",
@@ -24,7 +23,7 @@ class TestPassportMapper:
         mapper = PassportMapper()
         dynamo_item = mapper.to_dynamo(passport)
 
-        assert dynamo_item['PK'] == f'CRED#ca#{passport.issuer_id}'
+        assert dynamo_item['PK'] == f'CRED#ca#{passport.credential_id}'
         assert dynamo_item['SK'] == 'METADATA#passport'
         assert dynamo_item['issuing_country'] == 'ca'
 
@@ -35,8 +34,7 @@ class TestPassportMapper:
 
         reconstructed = mapper.to_domain(dynamo_item)
 
-        assert reconstructed.issuer_id == passport.issuer_id
-        assert reconstructed.holder_id == passport.holder_id
+        assert reconstructed.credential_id == passport.credential_id
         assert reconstructed.valid_from == passport.valid_from
         assert reconstructed.valid_until == passport.valid_until
         assert reconstructed.status == passport.status
@@ -56,8 +54,7 @@ class TestPassportMapper:
             self, passport):
         mapper = PassportMapper()
         dynamo_item = {
-            'issuer_id': 'test-issuer-789',
-            'holder_id': 'test-holder-012',
+            'credential_id': 'test-issuer-789',
             'valid_from': '2024-01-01T00:00:00+00:00',
             'valid_until': '2034-12-31T00:00:00+00:00',
             'nationality': 'Canadian',

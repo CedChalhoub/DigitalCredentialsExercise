@@ -123,7 +123,7 @@ Create a new credential. Requires API key authentication.
 **Body (Driver's License):**
 ```json
 {
-  "issuer_id": "string",
+  "credential_id": "string",
   "holder_id": "string",
   "valid_from": "2024-01-01T00:00:00Z",
   "valid_until": "2029-01-01T00:00:00Z",
@@ -136,7 +136,7 @@ Create a new credential. Requires API key authentication.
 **Body (Passport):**
 ```json
 {
-  "issuer_id": "string",
+  "credential_id": "string",
   "holder_id": "string",
   "valid_from": "2024-01-01T00:00:00Z",
   "valid_until": "2034-01-01T00:00:00Z",

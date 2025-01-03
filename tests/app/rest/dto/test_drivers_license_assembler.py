@@ -9,8 +9,7 @@ from app.domain.models.passport import Passport
 @pytest.fixture
 def passport():
     return Passport(
-        issuer_id="test-issuer-789",
-        holder_id="test-holder-012",
+        credential_id="test-issuer-789",
         valid_from=datetime(2024, 1, 1, tzinfo=UTC),
         valid_until=datetime(2034, 12, 31, tzinfo=UTC),
         nationality="Canadian",
@@ -24,8 +23,7 @@ class TestPassportAssembler:
         assembler = PassportAssembler()
         dto = assembler.to_dto(passport)
 
-        assert dto.issuer_id == passport.issuer_id
-        assert dto.holder_id == passport.holder_id
+        assert dto.credential_id == passport.credential_id
         assert dto.valid_from == passport.valid_from.isoformat()
         assert dto.valid_until == passport.valid_until.isoformat()
         assert dto.status == passport.status.value
@@ -38,8 +36,7 @@ class TestPassportAssembler:
             self, passport):
         assembler = PassportAssembler()
         dto = {
-            "issuer_id":passport.issuer_id,
-            "holder_id":passport.holder_id,
+            "credential_id":passport.credential_id,
             "valid_from":passport.valid_from.isoformat(),
             "valid_until":passport.valid_until.isoformat(),
             "nationality":passport.nationality,
@@ -48,8 +45,7 @@ class TestPassportAssembler:
 
         domain_obj = assembler.to_domain(dto)
 
-        assert domain_obj.issuer_id == passport.issuer_id
-        assert domain_obj.holder_id == passport.holder_id
+        assert domain_obj.credential_id == passport.credential_id
         assert domain_obj.valid_from.isoformat() == passport.valid_from.isoformat()
         assert domain_obj.valid_until.isoformat() == passport.valid_until.isoformat()
         assert domain_obj.nationality == passport.nationality

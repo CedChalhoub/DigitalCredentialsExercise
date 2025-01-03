@@ -102,7 +102,7 @@ class DynamoDBCredentialRepository(AbstractCredentialRepository):
         try:
             response = self._table.update_item(
                 Key={
-                    'PK': f'CRED#{credential.issuing_country}#{str(credential.issuer_id)}',
+                    'PK': f'CRED#{credential.issuing_country}#{str(credential.credential_id)}',
                     'SK': f'METADATA#{credential.get_credential_type().value}'
                 },
                 UpdateExpression=update_expression,

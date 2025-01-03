@@ -8,7 +8,7 @@ from app.rest.dto.credential_dto import CredentialDTO
 
 
 class MockCredential(Credential):
-    def _validate_issuer_id(self, holder_id: str) -> None:
+    def _validate_credential_id_format(self, holder_id: str) -> None:
         pass
 
     def get_credential_type(self):
@@ -22,8 +22,7 @@ class MockCredential(Credential):
 class MockAssembler(CredentialAssembler):
     def to_dto(self, credential: Credential) -> CredentialDTO:
         return CredentialDTO(
-            issuer_id="test_issuer",
-            holder_id="test_holder",
+            credential_id="test_issuer",
             valid_from="2024-01-01T00:00:00Z",
             valid_until="2024-12-31T23:59:59Z",
             issuing_country="CA"
@@ -31,8 +30,7 @@ class MockAssembler(CredentialAssembler):
 
     def to_domain(self, credential_dto: dict) -> Credential:
         return MockCredential(
-            issuer_id="test_issuer",
-            holder_id="test_holder",
+            credential_id="test_issuer",
             valid_from=datetime(2024, 1, 1, tzinfo=UTC),
             valid_until=datetime(2024, 12, 31, tzinfo=UTC),
             issuing_country="CA"

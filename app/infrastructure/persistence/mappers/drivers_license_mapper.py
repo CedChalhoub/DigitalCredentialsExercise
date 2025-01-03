@@ -9,11 +9,10 @@ from app.infrastructure.persistence.mappers.credential_mapper import CredentialM
 class DriversLicenseMapper(CredentialMapper):
     def to_dynamo(self, credential: DriversLicense) -> dict:
         return {
-            'PK': f'CRED#{credential.issuing_country}#{str(credential.issuer_id)}',
+            'PK': f'CRED#{credential.issuing_country}#{str(credential.credential_id)}',
             'SK': f'METADATA#drivers_license',
             'credential_type': CredentialType.DRIVERS_LICENSE.value,
-            'issuer_id': str(credential.issuer_id),
-            'holder_id': credential.holder_id,
+            'credential_id': str(credential.credential_id),
             'valid_from': credential.valid_from.isoformat(),
             'valid_until': credential.valid_until.isoformat(),
             'status': credential.status.value,
@@ -28,8 +27,7 @@ class DriversLicenseMapper(CredentialMapper):
         }
     def to_domain(self, item: dict) -> DriversLicense:
         drivers_license: DriversLicense = DriversLicense(
-            issuer_id=item['issuer_id'],
-            holder_id=item['holder_id'],
+            credential_id=item['credential_id'],
             valid_from=datetime.fromisoformat(item['valid_from']),
             valid_until=datetime.fromisoformat(item['valid_until']),
             vehicle_classes=item['vehicle_classes'],

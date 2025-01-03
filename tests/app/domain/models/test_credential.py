@@ -6,7 +6,7 @@ from app.domain.enums.credential_type import CredentialType
 
 
 class ConcreteTestCredential(Credential):
-    def _validate_issuer_id(self, holder_id: str) -> None:
+    def _validate_credential_id_format(self, credential_id: str) -> None:
         pass
 
     def get_credential_type(self) -> CredentialType:
@@ -25,8 +25,7 @@ def valid_dates():
 @pytest.fixture
 def credential(valid_dates):
     return ConcreteTestCredential(
-        issuer_id="test-issuer",
-        holder_id="test-holder",
+        credential_id="test-issuer",
         valid_from=valid_dates['valid_from'],
         valid_until=valid_dates['valid_until'],
         issuing_country="CA"
@@ -36,8 +35,7 @@ def credential(valid_dates):
 class TestCredentialBase:
     def test_given_valid_credential_data_when_creating_credential_then_creates_with_correct_values(
             self, credential, valid_dates):
-        assert credential.issuer_id == "test-issuer"
-        assert credential.holder_id == "test-holder"
+        assert credential.credential_id == "test-issuer"
         assert credential.valid_from == valid_dates['valid_from']
         assert credential.valid_until == valid_dates['valid_until']
         assert credential.issuing_country == "ca"  # Should be lowercase
@@ -46,8 +44,7 @@ class TestCredentialBase:
     def test_given_naive_datetime_when_creating_credential_then_raises_value_error(self):
         with pytest.raises(ValueError, match="valid_from must be timezone-aware"):
             ConcreteTestCredential(
-                issuer_id="test",
-                holder_id="test",
+                credential_id="test",
                 valid_from=datetime.now(),
                 valid_until=datetime.now(UTC),
                 issuing_country="CA"
@@ -55,8 +52,7 @@ class TestCredentialBase:
 
         with pytest.raises(ValueError, match="valid_until must be timezone-aware"):
             ConcreteTestCredential(
-                issuer_id="test",
-                holder_id="test",
+                credential_id="test",
                 valid_from=datetime.now(UTC),
                 valid_until=datetime.now(),
                 issuing_country="CA"

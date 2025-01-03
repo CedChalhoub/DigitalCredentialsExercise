@@ -32,8 +32,7 @@ def mock_db_manager():
 @pytest.fixture
 def sample_drivers_license():
     return DriversLicense(
-        issuer_id="test-issuer-123",
-        holder_id="test-holder-456",
+        credential_id="test-issuer-123",
         valid_from=datetime(2024, 1, 1, tzinfo=UTC),
         valid_until=datetime(2029, 12, 31, tzinfo=UTC),
         vehicle_classes=["A", "B"],
@@ -48,8 +47,7 @@ def dynamo_item():
         'PK': 'CRED#CA#test-issuer-123',
         'SK': 'METADATA#drivers_license',
         'credential_type': 'drivers_license',
-        'issuer_id': 'test-issuer-123',
-        'holder_id': 'test-holder-456',
+        'credential_id': 'test-issuer-123',
         'valid_from': '2024-01-01T00:00:00+00:00',
         'valid_until': '2029-12-31T00:00:00+00:00',
         'status': 'active',
@@ -70,8 +68,7 @@ class TestDynamoDBCredentialRepository:
 
         credential = repo.get_credential("test-issuer-123", CredentialType.DRIVERS_LICENSE, "ca")
 
-        assert credential.issuer_id == "test-issuer-123"
-        assert credential.holder_id == "test-holder-456"
+        assert credential.credential_id == "test-issuer-123"
         assert credential.issuing_country == "ca"
         mock_db_manager._dynamodb.Table().get_item.assert_called_once_with(
             Key={
@@ -111,7 +108,7 @@ class TestDynamoDBCredentialRepository:
 
         mock_db_manager._dynamodb.Table().put_item.assert_called_once()
         put_item_args = mock_db_manager._dynamodb.Table().put_item.call_args[1]['Item']
-        assert put_item_args['PK'] == f'CRED#ca#{sample_drivers_license.issuer_id}'
+        assert put_item_args['PK'] == f'CRED#ca#{sample_drivers_license.credential_id}'
         assert put_item_args['SK'] == 'METADATA#drivers_license'
 
     def test_given_database_error_when_creating_credential_then_raises_database_exception(
@@ -136,7 +133,7 @@ class TestDynamoDBCredentialRepository:
 
         mock_db_manager._dynamodb.Table().update_item.assert_called_once()
         update_args = mock_db_manager._dynamodb.Table().update_item.call_args[1]
-        assert update_args['Key']['PK'] == f'CRED#ca#{sample_drivers_license.issuer_id}'
+        assert update_args['Key']['PK'] == f'CRED#ca#{sample_drivers_license.credential_id}'
         assert update_args['Key']['SK'] == 'METADATA#drivers_license'
 
     def test_given_database_error_when_updating_status_then_raises_database_exception(

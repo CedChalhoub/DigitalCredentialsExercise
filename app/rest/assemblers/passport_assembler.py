@@ -17,8 +17,7 @@ class PassportAssembler(CredentialAssembler):
     def to_dto(self, passport: Passport) -> PassportDTO:
         try:
             return PassportDTO(
-                issuer_id=str(passport.issuer_id),
-                holder_id=passport.holder_id,
+                credential_id=str(passport.credential_id),
                 valid_from=passport.valid_from.isoformat(),
                 valid_until=passport.valid_until.isoformat(),
                 status=passport.status.value,
@@ -33,8 +32,7 @@ class PassportAssembler(CredentialAssembler):
     def to_domain(self, credential_dto: dict) -> Passport:
         passport_dto = self._to_specific_dto(credential_dto)
         return Passport(
-            holder_id=passport_dto.holder_id,
-            issuer_id=passport_dto.issuer_id,
+            credential_id=passport_dto.credential_id,
             valid_from=datetime.fromisoformat(passport_dto.valid_from),
             valid_until=datetime.fromisoformat(passport_dto.valid_until),
             nationality=passport_dto.nationality,

@@ -8,8 +8,7 @@ from app.infrastructure.persistence.mappers.drivers_license_mapper import Driver
 @pytest.fixture
 def drivers_license():
     return DriversLicense(
-        issuer_id="test-issuer-123",
-        holder_id="test-holder-456",
+        credential_id="test-issuer-123",
         valid_from=datetime(2024, 1, 1, tzinfo=UTC),
         valid_until=datetime(2029, 12, 31, tzinfo=UTC),
         vehicle_classes=["A", "B"],
@@ -24,7 +23,7 @@ class TestDriversLicenseMapper:
         mapper = DriversLicenseMapper()
         dynamo_item = mapper.to_dynamo(drivers_license)
 
-        assert dynamo_item['PK'] == f'CRED#ca#{drivers_license.issuer_id}'
+        assert dynamo_item['PK'] == f'CRED#ca#{drivers_license.credential_id}'
         assert dynamo_item['SK'] == f'METADATA#drivers_license'
         assert dynamo_item['issuing_country'] == 'ca'
         assert dynamo_item['issuing_region'] == 'on'
@@ -36,8 +35,7 @@ class TestDriversLicenseMapper:
 
         reconstructed = mapper.to_domain(dynamo_item)
 
-        assert reconstructed.issuer_id == drivers_license.issuer_id
-        assert reconstructed.holder_id == drivers_license.holder_id
+        assert reconstructed.credential_id == drivers_license.credential_id
         assert reconstructed.valid_from == drivers_license.valid_from
         assert reconstructed.valid_until == drivers_license.valid_until
         assert reconstructed.status == drivers_license.status
@@ -58,8 +56,7 @@ class TestDriversLicenseMapper:
             self, drivers_license):
         mapper = DriversLicenseMapper()
         dynamo_item = {
-            'issuer_id': 'test-issuer-123',
-            'holder_id': 'test-holder-456',
+            'credential_id': 'test-issuer-123',
             'valid_from': '2024-01-01T00:00:00+00:00',
             'valid_until': '2029-12-31T00:00:00+00:00',
             'vehicle_classes': ['A', 'B'],

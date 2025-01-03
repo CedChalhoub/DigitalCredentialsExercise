@@ -21,8 +21,7 @@ def credential_service(mock_repository):
 @pytest.fixture
 def sample_drivers_license():
     return DriversLicense(
-        issuer_id="test-issuer-123",
-        holder_id="test-holder-456",
+        credential_id="test-issuer-123",
         valid_from=datetime(2024, 1, 1, tzinfo=UTC),
         valid_until=datetime(2029, 12, 31, tzinfo=UTC),
         vehicle_classes=["A", "B"],

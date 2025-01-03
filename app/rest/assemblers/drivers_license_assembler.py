@@ -16,8 +16,7 @@ class DriversLicenseAssembler(CredentialAssembler):
             raise InvalidCredentialDataException("format", str(e))
     def to_dto(self, drivers_license: DriversLicense) -> DriversLicenseDTO:
         return DriversLicenseDTO(
-            issuer_id=str(drivers_license.issuer_id),
-            holder_id=drivers_license.holder_id,
+            credential_id=str(drivers_license.credential_id),
             valid_from=drivers_license.valid_from.isoformat(),
             valid_until=drivers_license.valid_until.isoformat(),
             issuing_country=drivers_license.issuing_country,
@@ -31,8 +30,7 @@ class DriversLicenseAssembler(CredentialAssembler):
     def to_domain(self, credential_dto: CredentialDTO) -> DriversLicense:
         license_dto = self._to_specific_dto(credential_dto)
         return DriversLicense(
-            issuer_id=license_dto.issuer_id,
-            holder_id=license_dto.holder_id,
+            credential_id=license_dto.credential_id,
             valid_from=datetime.fromisoformat(license_dto.valid_from),
             valid_until=datetime.fromisoformat(license_dto.valid_until),
             issuing_country=license_dto.issuing_country,
