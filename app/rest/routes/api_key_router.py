@@ -8,7 +8,7 @@ from app.rest.dto.generate_api_key_dto import GenerateApiKeyDto
 
 class ApiKeyRouter:
     def __init__(self):
-        self._router = APIRouter(prefix="/api-keys")
+        self._router = APIRouter(prefix="/credentials/api-keys")
         self.setup_routes()
 
     @property
