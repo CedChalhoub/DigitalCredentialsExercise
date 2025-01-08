@@ -22,7 +22,7 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /credentials/{proxy+}  # Add the correct path
+            Path: /{proxy+}  # Add the correct path
             Method: ANY  # This will allow any method (GET, POST, etc.)
             RestApiId: !Ref ApiGatewayApi  # Link the function to the API Gateway
             Auth:
